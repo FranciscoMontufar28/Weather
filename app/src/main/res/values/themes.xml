@@ -1,0 +1,7 @@
+<resources>
+    <!-- Base theme for the Compose-only app. No ActionBar — Compose Scaffold handles navigation. -->
+    <style name="Theme.Weather" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>
