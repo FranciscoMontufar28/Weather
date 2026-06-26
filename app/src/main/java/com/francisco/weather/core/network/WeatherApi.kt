@@ -1,5 +1,6 @@
 package com.francisco.weather.core.network
 
+import com.francisco.weather.feature.dashboard.data.dto.SportsResponseDto
 import com.francisco.weather.feature.forecast.data.dto.ForecastResponseDto
 import com.francisco.weather.feature.search.data.dto.LocationDto
 import retrofit2.http.GET
@@ -14,5 +15,9 @@ interface WeatherApi {
     suspend fun forecast(
         @Query("q") location: String,
         @Query("days") days: Int = 3,
+        @Query("alerts") alerts: String = "yes",
     ): ForecastResponseDto
+
+    @GET("sports.json")
+    suspend fun sports(@Query("q") q: String): SportsResponseDto
 }

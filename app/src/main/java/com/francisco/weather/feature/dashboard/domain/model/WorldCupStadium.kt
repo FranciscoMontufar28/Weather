@@ -12,4 +12,8 @@ data class WorldCupStadium(
     val tempC: Double? = null,
     val conditionText: String? = null,
     val conditionIconUrl: String? = null,
+    // Sports — null until first sync (or no upcoming match)
+    val matchName: String? = null,
+    val matchTournament: String? = null,
+    val matchStart: String? = null,
 )

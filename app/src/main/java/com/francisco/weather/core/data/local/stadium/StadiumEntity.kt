@@ -17,4 +17,9 @@ data class StadiumEntity(
     val conditionText: String? = null,
     val conditionIconUrl: String? = null,
     val weatherUpdatedAt: Long? = null,
+    // Sports fields — null until the first sports sync
+    val matchName: String? = null,
+    val matchTournament: String? = null,
+    val matchStart: String? = null,
+    val sportsUpdatedAt: Long? = null,
 )

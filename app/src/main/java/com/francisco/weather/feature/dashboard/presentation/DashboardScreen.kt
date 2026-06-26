@@ -172,6 +172,17 @@ fun DashboardScreen(
         }
     }
 
+    // IP fallback: when location resolved but permission denied / GPS off, load via IP
+    LaunchedEffect(state.locationResolved, state.locationPermissionGranted, state.isGpsEnabled) {
+        if (state.locationResolved &&
+            !state.locationPermissionGranted &&
+            state.currentWeather == null &&
+            !state.isLoadingWeather
+        ) {
+            viewModel.onEvent(DashboardEvent.LoadCurrentWeather("auto:ip"))
+        }
+    }
+
     val onUseLocation: () -> Unit = {
         when {
             !state.locationPermissionGranted -> {
@@ -516,12 +527,35 @@ private fun MyLocationCard(
             Box(modifier = Modifier.padding(20.dp).fillMaxWidth()) {
                 when {
                     state.currentWeather != null -> {
-                        WeatherContent(
-                            forecast = state.currentWeather!!,
-                            sky = sky,
-                            context = context,
-                            onClick = onOpenForecast,
-                        )
+                        Column {
+                            WeatherContent(
+                                forecast = state.currentWeather!!,
+                                sky = sky,
+                                context = context,
+                                onClick = onOpenForecast,
+                            )
+                            if (state.isApproxLocation) {
+                                Spacer(Modifier.height(8.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth(),
+                                ) {
+                                    Text(
+                                        text = "📍 Ubicación aproximada (IP)",
+                                        fontSize = 11.sp,
+                                        color = sky.textMuted,
+                                    )
+                                    Text(
+                                        text = "Usar GPS",
+                                        fontSize = 11.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = sky.accent,
+                                        modifier = Modifier.clickable(onClick = onUseLocation),
+                                    )
+                                }
+                            }
+                        }
                     }
                     state.isLoadingWeather -> {
                         Box(
@@ -1010,12 +1044,63 @@ private fun StadiumCard(
                         )
                     }
                 }
+                // Sports event section
+                if (stadium.matchName != null) {
+                    androidx.compose.material3.HorizontalDivider(
+                        color = GlassStroke,
+                        thickness = 0.5.dp,
+                        modifier = Modifier.padding(vertical = 6.dp),
+                    )
+                    Text(
+                        text = "⚽ Próximo partido",
+                        fontSize = 9.sp,
+                        color = sky.textMuted,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 0.5.sp,
+                    )
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = stadium.matchName,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = SkyTextPrimary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    if (stadium.matchTournament != null) {
+                        Text(
+                            text = stadium.matchTournament,
+                            fontSize = 10.sp,
+                            color = sky.accent,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    if (stadium.matchStart != null) {
+                        Text(
+                            text = stadium.matchStart.formatMatchStart(),
+                            fontSize = 10.sp,
+                            color = sky.textMuted,
+                        )
+                    }
+                }
             }
         }
     }
 }
 
 // ── Extensions ────────────────────────────────────────────────────────────────
+
+/**
+ * Formats "yyyy-MM-dd HH:mm" to a short "dd/MM HH:mm" label for stadium cards.
+ */
+private fun String.formatMatchStart(): String = try {
+    val parts = this.split(" ")
+    if (parts.size == 2) {
+        val dateParts = parts[0].split("-")
+        "${dateParts[2]}/${dateParts[1]} ${parts[1]}"
+    } else this
+} catch (_: Exception) { this }
 
 private fun Context.isGpsEnabled(): Boolean {
     val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager

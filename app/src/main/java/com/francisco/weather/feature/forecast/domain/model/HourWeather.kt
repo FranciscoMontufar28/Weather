@@ -3,11 +3,10 @@ package com.francisco.weather.feature.forecast.domain.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CurrentWeather(
+data class HourWeather(
+    val time: String,          // "2026-06-26 15:00"
     val tempC: Double,
     val condition: Condition,
-    val humidity: Int,
-    val windKph: Double,
-    val feelsLikeC: Double,
-    val uv: Double = 0.0,
+    val chanceOfRain: Int,     // 0-100
+    val isDay: Boolean,
 )

@@ -15,4 +15,6 @@ data class DashboardState(
     val recentSearches: List<RecentSearch> = emptyList(),
     val stadiums: List<WorldCupStadium> = emptyList(),
     val isLoadingStadiums: Boolean = false,
+    /** True when location was resolved via IP (permission denied / GPS unavailable). */
+    val isApproxLocation: Boolean = false,
 ) : BaseState

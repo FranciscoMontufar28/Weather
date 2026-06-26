@@ -19,10 +19,18 @@ class LoadCurrentWeatherBloc(
     ) {
         updateState { it.copy(isLoadingWeather = true, weatherError = null) }
 
+        val isIpFallback = event.locationQuery == "auto:ip"
         repository.getForecast(event.locationQuery).fold(
             onSuccess = { forecast ->
                 cacheRepository.save(forecast)
-                updateState { it.copy(currentWeather = forecast, isLoadingWeather = false, weatherError = null) }
+                updateState {
+                    it.copy(
+                        currentWeather = forecast,
+                        isLoadingWeather = false,
+                        weatherError = null,
+                        isApproxLocation = isIpFallback,
+                    )
+                }
             },
             onFailure = { error ->
                 updateState {

@@ -2,6 +2,7 @@ package com.francisco.weather.feature.forecast.presentation.blocs
 
 import com.francisco.weather.core.network.WeatherError
 import com.francisco.weather.feature.forecast.domain.ForecastRepository
+import com.francisco.weather.feature.forecast.domain.model.Astro
 import com.francisco.weather.feature.forecast.domain.model.Condition
 import com.francisco.weather.feature.forecast.domain.model.CurrentWeather
 import com.francisco.weather.feature.forecast.domain.model.DayWeather
@@ -36,6 +37,7 @@ class LoadForecastBlocTest {
                 maxTempC = 18.0,
                 minTempC = 10.0,
                 condition = Condition("Nublado", "https://cdn.weatherapi.com/weather/64x64/day/119.png", 1006),
+                astro = Astro("05:47 AM", "06:10 PM", "Waxing Gibbous", 93),
             ),
         ),
         current = CurrentWeather(

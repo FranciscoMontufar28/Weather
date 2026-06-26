@@ -11,7 +11,7 @@ import com.francisco.weather.core.data.local.weather.CachedWeatherEntity
 
 @Database(
     entities = [RecentSearchEntity::class, StadiumEntity::class, CachedWeatherEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 abstract class WeatherDatabase : RoomDatabase() {

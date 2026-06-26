@@ -11,4 +11,6 @@ data class ForecastData(
     val days: List<DayWeather>,
     /** Current real-time conditions (used in landscape detail panel) */
     val current: CurrentWeather,
+    /** Active weather alerts — empty for most locations */
+    val alerts: List<WeatherAlert> = emptyList(),
 )
