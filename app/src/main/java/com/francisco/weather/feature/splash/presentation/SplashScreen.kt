@@ -88,7 +88,7 @@ fun SplashScreen(
                 modifier = Modifier.size(100.dp),
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(WeatherTheme.Size.huge))
 
             Text(
                 text = "Breezy",
@@ -106,7 +106,7 @@ fun SplashScreen(
                 ),
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(WeatherTheme.Size.xMedium))
 
             Text(
                 text = "Tu clima, siempre claro.",

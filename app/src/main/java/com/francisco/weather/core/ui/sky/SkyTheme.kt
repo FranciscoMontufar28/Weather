@@ -114,16 +114,3 @@ fun rememberSkyColors(): SkyColors {
     }
 }
 
-// ── Shared surface constants (not time-dependent) ────────────────────────────
-
-/** `$glass-fill` — 12 % white fill for glass cards. */
-val GlassFill = Color(0x1FFFFFFF)
-
-/** `$glass-stroke` — 27 % white border for glass cards. */
-val GlassStroke = Color(0x45FFFFFF)
-
-/** `$glass-strong` — 19 % white for elevated glass surfaces. */
-val GlassStrong = Color(0x30FFFFFF)
-
-/** All text on the sky background is white. */
-val SkyTextPrimary = Color(0xFFFFFFFF)

@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class WeatherAlert(
+    val id: String = "",
     val headline: String,
     val event: String,
     val severity: String, // "Moderate", "Severe", "Extreme"

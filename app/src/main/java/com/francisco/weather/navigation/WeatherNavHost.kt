@@ -2,6 +2,7 @@ package com.francisco.weather.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -35,9 +36,15 @@ fun WeatherNavHost(modifier: Modifier = Modifier) {
 
         composable(WeatherDestinations.DASHBOARD) {
             DashboardScreen(
-                onOpenSearch = { navController.navigate(WeatherDestinations.SEARCH) },
+                onOpenSearch = {
+                    if (navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                        navController.navigate(WeatherDestinations.SEARCH)
+                    }
+                },
                 onOpenForecast = { locationQuery ->
-                    navController.navigate(WeatherDestinations.forecastRoute(locationQuery))
+                    if (navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                        navController.navigate(WeatherDestinations.forecastRoute(locationQuery))
+                    }
                 },
             )
         }
@@ -45,9 +52,15 @@ fun WeatherNavHost(modifier: Modifier = Modifier) {
         composable(WeatherDestinations.SEARCH) {
             SearchScreen(
                 onLocationSelected = { locationQuery ->
-                    navController.navigate(WeatherDestinations.forecastRoute(locationQuery))
+                    if (navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                        navController.navigate(WeatherDestinations.forecastRoute(locationQuery))
+                    }
                 },
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = {
+                    if (navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                        navController.popBackStack()
+                    }
+                },
             )
         }
 
@@ -61,7 +74,11 @@ fun WeatherNavHost(modifier: Modifier = Modifier) {
             val locationQuery = URLDecoder.decode(encoded, StandardCharsets.UTF_8.toString())
             ForecastScreen(
                 locationQuery = locationQuery,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = {
+                    if (navController.currentBackStackEntry?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                        navController.popBackStack()
+                    }
+                },
             )
         }
     }

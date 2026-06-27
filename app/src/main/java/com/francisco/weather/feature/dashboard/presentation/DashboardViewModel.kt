@@ -34,7 +34,10 @@ class DashboardViewModel @Inject constructor(
             cachedWeatherRepository.observeCached().collect { cached ->
                 safeUpdateState { state ->
                     if (state.currentWeather == null && cached != null) {
-                        state.copy(currentWeather = cached)
+                        // If permission was already resolved as denied when cache emits, mark approx
+                        val approx = state.isApproxLocation ||
+                            (state.locationResolved && !state.locationPermissionGranted)
+                        state.copy(currentWeather = cached, isApproxLocation = approx)
                     } else {
                         state
                     }
@@ -49,15 +52,21 @@ class DashboardViewModel @Inject constructor(
     override fun onEvent(event: DashboardEvent) {
         when (event) {
             is DashboardEvent.LocationPermissionResult -> viewModelScope.launch {
-                safeUpdateState { it.copy(locationPermissionGranted = event.granted, locationResolved = true) }
-                // No GPS access — load weather by IP if nothing is loaded yet
-                if (!event.granted) {
-                    val st = _state.value
-                    if (st.currentWeather == null && !st.isLoadingWeather) {
-                        // Pre-signal loading so the UI never shows EnableLocationPrompt
-                        safeUpdateState { it.copy(isLoadingWeather = true) }
-                        onEvent(DashboardEvent.LoadCurrentWeather("auto:ip"))
-                    }
+                val st = _state.value
+                safeUpdateState {
+                    it.copy(
+                        locationPermissionGranted = event.granted,
+                        locationResolved = true,
+                        isApproxLocation = when {
+                            event.granted -> false
+                            st.currentWeather != null -> true
+                            else -> it.isApproxLocation
+                        },
+                    )
+                }
+                if (!event.granted && st.currentWeather == null && !st.isLoadingWeather) {
+                    safeUpdateState { it.copy(isLoadingWeather = true) }
+                    onEvent(DashboardEvent.LoadCurrentWeather("auto:ip"))
                 }
             }
             is DashboardEvent.GpsStateChanged -> viewModelScope.launch {

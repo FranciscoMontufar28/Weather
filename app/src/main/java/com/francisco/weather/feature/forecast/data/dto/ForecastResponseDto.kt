@@ -149,6 +149,7 @@ fun HourDto.toDomain(): HourWeather = HourWeather(
 )
 
 fun AlertDto.toDomain(): WeatherAlert = WeatherAlert(
+    id = java.util.UUID.randomUUID().toString(),
     headline = headline,
     event = event,
     severity = severity,
