@@ -9,7 +9,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface StadiumDao {
 
-    @Query("SELECT * FROM world_cup_stadiums")
+    @Query("""
+        SELECT * FROM world_cup_stadiums
+        ORDER BY
+            CASE WHEN matchStart IS NULL THEN 1 ELSE 0 END,
+            matchStart ASC
+    """)
     fun observeAll(): Flow<List<StadiumEntity>>
 
     /** Inserts base stadium rows without overwriting cached weather/sports data. */

@@ -50,6 +50,15 @@ class DashboardViewModel @Inject constructor(
         when (event) {
             is DashboardEvent.LocationPermissionResult -> viewModelScope.launch {
                 safeUpdateState { it.copy(locationPermissionGranted = event.granted, locationResolved = true) }
+                // No GPS access — load weather by IP if nothing is loaded yet
+                if (!event.granted) {
+                    val st = _state.value
+                    if (st.currentWeather == null && !st.isLoadingWeather) {
+                        // Pre-signal loading so the UI never shows EnableLocationPrompt
+                        safeUpdateState { it.copy(isLoadingWeather = true) }
+                        onEvent(DashboardEvent.LoadCurrentWeather("auto:ip"))
+                    }
+                }
             }
             is DashboardEvent.GpsStateChanged -> viewModelScope.launch {
                 safeUpdateState { it.copy(isGpsEnabled = event.enabled) }

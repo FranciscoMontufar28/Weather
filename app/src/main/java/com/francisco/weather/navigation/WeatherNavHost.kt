@@ -45,9 +45,7 @@ fun WeatherNavHost(modifier: Modifier = Modifier) {
         composable(WeatherDestinations.SEARCH) {
             SearchScreen(
                 onLocationSelected = { locationQuery ->
-                    navController.navigate(WeatherDestinations.forecastRoute(locationQuery)) {
-                        popUpTo(WeatherDestinations.SEARCH) { inclusive = true }
-                    }
+                    navController.navigate(WeatherDestinations.forecastRoute(locationQuery))
                 },
                 onNavigateBack = { navController.popBackStack() },
             )

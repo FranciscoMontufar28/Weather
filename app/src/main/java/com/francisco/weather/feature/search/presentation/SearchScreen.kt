@@ -48,6 +48,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -86,9 +88,13 @@ fun SearchScreen(
 
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(state.error) {
         if (state.error != null) viewModel.onEvent(SearchEvent.ClearError)
+    }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 
     Box(
@@ -121,6 +127,7 @@ fun SearchScreen(
                 },
                 onLocationClick = onLocationClick,
                 onNavigateBack = onNavigateBack,
+                focusRequester = focusRequester,
             )
         } else {
             SearchPortrait(
@@ -137,6 +144,7 @@ fun SearchScreen(
                 },
                 onLocationClick = onLocationClick,
                 onNavigateBack = onNavigateBack,
+                focusRequester = focusRequester,
             )
         }
     }
@@ -153,6 +161,7 @@ private fun SearchPortrait(
     onClear: () -> Unit,
     onLocationClick: (Location) -> Unit,
     onNavigateBack: () -> Unit,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -172,6 +181,7 @@ private fun SearchPortrait(
             onQueryChange = onQueryChange,
             onClear = onClear,
             sky = sky,
+            focusRequester = focusRequester,
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -197,6 +207,7 @@ private fun SearchLandscape(
     onClear: () -> Unit,
     onLocationClick: (Location) -> Unit,
     onNavigateBack: () -> Unit,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -218,6 +229,7 @@ private fun SearchLandscape(
                 onQueryChange = onQueryChange,
                 onClear = onClear,
                 sky = sky,
+                focusRequester = focusRequester,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
@@ -282,6 +294,7 @@ private fun GlassSearchField(
     onQueryChange: (String) -> Unit,
     onClear: () -> Unit,
     sky: com.francisco.weather.core.ui.sky.SkyColors,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -323,7 +336,7 @@ private fun GlassSearchField(
                         inner()
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).focusRequester(focusRequester),
             )
             if (query.isNotEmpty()) {
                 IconButton(

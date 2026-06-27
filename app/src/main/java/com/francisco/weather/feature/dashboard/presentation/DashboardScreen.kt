@@ -172,17 +172,6 @@ fun DashboardScreen(
         }
     }
 
-    // IP fallback: when location resolved but permission denied / GPS off, load via IP
-    LaunchedEffect(state.locationResolved, state.locationPermissionGranted, state.isGpsEnabled) {
-        if (state.locationResolved &&
-            !state.locationPermissionGranted &&
-            state.currentWeather == null &&
-            !state.isLoadingWeather
-        ) {
-            viewModel.onEvent(DashboardEvent.LoadCurrentWeather("auto:ip"))
-        }
-    }
-
     val onUseLocation: () -> Unit = {
         when {
             !state.locationPermissionGranted -> {
@@ -213,7 +202,10 @@ fun DashboardScreen(
         }
     }
 
-    val onMyLocationForecast: () -> Unit = { currentLocationQuery?.let { onOpenForecast(it) } }
+    val onMyLocationForecast: () -> Unit = {
+        val q = currentLocationQuery ?: state.currentWeather?.locationName
+        q?.let { onOpenForecast(it) }
+    }
     val onRecentForecast: (RecentSearch) -> Unit = { onOpenForecast(it.name) }
     val onClearRecents: () -> Unit = { viewModel.onEvent(DashboardEvent.ClearRecents) }
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -547,7 +539,7 @@ private fun MyLocationCard(
                                         color = sky.textMuted,
                                     )
                                     Text(
-                                        text = "Usar GPS",
+                                        text = "Mejorar precisión",
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.SemiBold,
                                         color = sky.accent,
@@ -640,7 +632,7 @@ private fun EnableLocationPrompt(
             )
         }
         Text(
-            text = "Enable location to see local weather",
+            text = "No se pudo obtener el clima. Activa la ubicación para ver el pronóstico local.",
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             color = SkyTextPrimary,
@@ -652,7 +644,7 @@ private fun EnableLocationPrompt(
             modifier = Modifier.clickable(onClick = onEnable),
         ) {
             Text(
-                text = "Enable Location",
+                text = "Usar ubicación",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = sky.accent,
@@ -724,7 +716,7 @@ private fun WeatherContent(
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(context)
-                        .data("https:${forecast.current.condition.iconUrl}")
+                        .data(forecast.current.condition.iconUrl)
                         .crossfade(true)
                         .build(),
                     contentDescription = forecast.current.condition.text,
@@ -1030,7 +1022,7 @@ private fun StadiumCard(
                     ) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data("https:${stadium.conditionIconUrl}")
+                                .data(stadium.conditionIconUrl)
                                 .crossfade(true)
                                 .build(),
                             contentDescription = stadium.conditionText,
