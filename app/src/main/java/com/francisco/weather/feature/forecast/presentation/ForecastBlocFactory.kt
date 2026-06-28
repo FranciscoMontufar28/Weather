@@ -8,9 +8,8 @@ import com.francisco.weather.feature.forecast.presentation.blocs.LoadForecastBlo
 
 class ForecastBlocFactory(
     loadForecastBloc: LoadForecastBloc,
+    clearErrorBloc: ClearForecastErrorBloc,
 ) : BaseBlocFactory<ForecastEvent, ForecastState>() {
-
-    private val clearErrorBloc = ClearForecastErrorBloc()
 
     override val blocs = blocMapOf(
         ForecastEvent.Load::class with loadForecastBloc,

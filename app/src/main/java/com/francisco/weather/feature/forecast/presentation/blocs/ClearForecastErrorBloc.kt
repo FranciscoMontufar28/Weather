@@ -3,8 +3,9 @@ package com.francisco.weather.feature.forecast.presentation.blocs
 import com.francisco.weather.core.bloc.BaseBloc
 import com.francisco.weather.feature.forecast.presentation.ForecastEvent
 import com.francisco.weather.feature.forecast.presentation.ForecastState
+import javax.inject.Inject
 
-class ClearForecastErrorBloc : BaseBloc<ForecastEvent.ClearError, ForecastState>() {
+class ClearForecastErrorBloc @Inject constructor() : BaseBloc<ForecastEvent.ClearError, ForecastState>() {
 
     override val tag = "ClearForecastErrorBloc"
 

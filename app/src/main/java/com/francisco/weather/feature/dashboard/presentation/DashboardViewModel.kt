@@ -1,6 +1,5 @@
 package com.francisco.weather.feature.dashboard.presentation
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.francisco.weather.core.bloc.BlocViewModel
 import com.francisco.weather.feature.dashboard.domain.usecase.ObserveDashboardUseCase
@@ -20,8 +19,6 @@ class DashboardViewModel @Inject constructor(
         // sync, weather load) triggers this collector automatically.
         viewModelScope.launch {
             observeDashboard().collect { data ->
-                val withMatch = data.stadiums.count { it.matchName != null }
-                Log.d("magnus", "observeDashboard EMIT → weather=${data.cachedWeather?.locationName ?: "null"} (${data.cachedWeather?.region ?: ""}), stadiums=${data.stadiums.size} (withMatch=$withMatch), recents=${data.recentSearches.size}")
                 safeUpdateState { state ->
                     state.copy(
                         recentSearches = data.recentSearches,

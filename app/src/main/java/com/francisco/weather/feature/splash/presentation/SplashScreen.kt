@@ -48,7 +48,7 @@ fun SplashScreen(
     modifier: Modifier = Modifier,
 ) {
     val lottieComposition by rememberLottieComposition(
-        LottieCompositionSpec.Url("https://lottie.host/663f17a9-f6dc-46e8-9285-0a6c9561243d/AU338dlFCB.lottie")
+        LottieCompositionSpec.Asset("splash_weather.lottie")
     )
     val lottieProgress by animateLottieCompositionAsState(
         composition = lottieComposition,
