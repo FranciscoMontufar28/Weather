@@ -14,9 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-private const val WEATHER_TTL_MS = 5 * 60 * 1000L   // 5 minutes
-private const val SPORTS_TTL_MS  = 5 * 60 * 1000L   // 5 minutes
-
 class StadiumRepositoryImpl @Inject constructor(
     private val dao: StadiumDao,
     private val remote: StadiumRemoteDataSource,
@@ -27,7 +24,7 @@ class StadiumRepositoryImpl @Inject constructor(
     override fun observeStadiums(): Flow<List<WorldCupStadium>> =
         dao.observeAll().map { entities -> entities.map { it.toDomain() } }
 
-    override suspend fun syncFromRemote(force: Boolean) {
+    override suspend fun syncFromRemote() {
         val base = remote.fetch()
 
         // Insert base rows without overwriting any cached weather/sports data
@@ -35,72 +32,53 @@ class StadiumRepositoryImpl @Inject constructor(
 
         val now = System.currentTimeMillis()
 
-        // TTL guard: skip weather fetch if refreshed less than 5 min ago.
-        // force=true bypasses the guard so conditionText re-fetches after a language change.
-        val lastWeather = dao.lastWeatherUpdate()
-        if (force || lastWeather == null || now - lastWeather >= WEATHER_TTL_MS) {
-            // Fetch weather for all stadiums concurrently
-            coroutineScope {
-                base.map { stadium ->
-                    async {
-                        forecastRepository
-                            .getForecast("${stadium.latitude},${stadium.longitude}")
-                            .onSuccess { forecast ->
-                                dao.updateWeather(
-                                    name = stadium.name,
-                                    tempC = forecast.current.tempC,
-                                    text = forecast.current.condition.text,
-                                    icon = forecast.current.condition.iconUrl,
-                                    ts = now,
-                                )
-                            }
-                    }
-                }.awaitAll()
-            }
+        // Fetch weather for all stadiums concurrently
+        coroutineScope {
+            base.map { stadium ->
+                async {
+                    forecastRepository
+                        .getForecast("${stadium.latitude},${stadium.longitude}")
+                        .onSuccess { forecast ->
+                            dao.updateWeather(
+                                name = stadium.name,
+                                tempC = forecast.current.tempC,
+                                text = forecast.current.condition.text,
+                                icon = forecast.current.condition.iconUrl,
+                                ts = now,
+                            )
+                        }
+                }
+            }.awaitAll()
         }
 
-        // TTL guard: skip sports fetch if refreshed less than 5 min ago
-        val lastSports = dao.lastSportsUpdate()
-        Log.d("magnus", "syncFromRemote sports TTL check: lastSports=$lastSports now=$now delta=${if (lastSports != null) now - lastSports else -1}ms threshold=${SPORTS_TTL_MS}ms → fetch=${lastSports == null || now - lastSports >= SPORTS_TTL_MS}")
-        if (lastSports == null || now - lastSports >= SPORTS_TTL_MS) {
-            // Fetch sports for all stadiums concurrently with lat,lon → city fallback
-            coroutineScope {
-                base.map { stadium ->
-                    async {
-                        runCatching {
-                            val latLonQuery = "${stadium.latitude},${stadium.longitude}"
-                            Log.d("magnus", "sports FETCH [${stadium.name}] query=$latLonQuery")
-                            val eventByLatLon = api.sports(latLonQuery).nextEvent()
-                            val event = if (eventByLatLon != null) {
-                                Log.d("magnus", "sports HIT latLon [${stadium.name}] → ${eventByLatLon.match} (${eventByLatLon.tournament})")
-                                eventByLatLon
-                            } else {
-                                Log.d("magnus", "sports MISS latLon [${stadium.name}] → fallback city=${stadium.city}")
-                                val eventByCity = api.sports(stadium.city).nextEvent()
-                                if (eventByCity != null) {
-                                    Log.d("magnus", "sports HIT city [${stadium.name}] → ${eventByCity.match} (${eventByCity.tournament})")
-                                } else {
-                                    Log.d("magnus", "sports MISS city [${stadium.name}] → no event, skipping")
-                                }
-                                eventByCity
-                            }
+        // Fetch sports for all stadiums concurrently with lat,lon → city fallback.
+        // Each call is isolated in its own runCatching so a lat,lon failure still attempts the city.
+        coroutineScope {
+            base.map { stadium ->
+                async {
+                    val latLonQuery = "${stadium.latitude},${stadium.longitude}"
+                    Log.d("magnus", "sports FETCH [${stadium.name}] query=$latLonQuery")
+                    val event = runCatching { api.sports(latLonQuery).nextEvent() }
+                        .onFailure { Log.d("magnus", "sports ERROR latLon [${stadium.name}] ${it.message}") }
+                        .getOrNull()
+                        ?: runCatching { api.sports(stadium.city).nextEvent() }
+                            .onFailure { Log.d("magnus", "sports ERROR city [${stadium.name}] ${it.message}") }
+                            .getOrNull()
 
-                            if (event != null) {
-                                dao.updateSports(
-                                    name = stadium.name,
-                                    matchName = event.match,
-                                    matchTournament = event.tournament,
-                                    matchStart = event.start,
-                                    ts = now,
-                                )
-                            }
-                        }.onFailure { e ->
-                            Log.d("magnus", "sports ERROR [${stadium.name}] ${e.message}")
-                        }
-                        // runCatching absorbs individual failures — other stadiums still update
+                    if (event != null) {
+                        Log.d("magnus", "sports HIT [${stadium.name}] → ${event.match} (${event.tournament})")
+                        dao.updateSports(
+                            name = stadium.name,
+                            matchName = event.match,
+                            matchTournament = event.tournament,
+                            matchStart = event.start,
+                            ts = now,
+                        )
+                    } else {
+                        Log.d("magnus", "sports MISS [${stadium.name}] → no event")
                     }
-                }.awaitAll()
-            }
+                }
+            }.awaitAll()
         }
     }
 

@@ -12,17 +12,6 @@ class DashboardViewModel @Inject constructor(
     private val observeDashboard: ObserveDashboardUseCase,
 ) : BlocViewModel<DashboardEvent, DashboardState>(DashboardState()) {
 
-    // Survives configuration changes (ViewModel lifetime). Set once the GPS location is
-    // resolved; the language-change LaunchedEffect uses it to re-fetch in the new locale.
-    // Null means no GPS fix yet (IP-fallback path or no permission).
-    var resolvedLocationQuery: String? = null
-        private set
-
-    fun onLocationResolved(query: String) {
-        Log.d("magnus", "onLocationResolved → $query")
-        resolvedLocationQuery = query
-    }
-
     init {
         // Single reactive pipeline: combines recents + stadiums + cachedWeather into one
         // Flow<DashboardData>. The DB is the single source of truth; every write (search,
@@ -34,7 +23,7 @@ class DashboardViewModel @Inject constructor(
                 safeUpdateState { state ->
                     state.copy(
                         recentSearches = data.recentSearches,
-                        stadiums       = data.stadiums,
+                        stadiums       = data.stadiums.filter { it.matchName != null },
                         currentWeather = data.cachedWeather,
                         // The observer is the sole writer of currentWeather and the sole
                         // one that clears the spinner — but only when real data arrives,
@@ -46,6 +35,6 @@ class DashboardViewModel @Inject constructor(
         }
         // One-shot sync: API → writes DB → ends. The result surfaces via observeDashboard().
         // Runs once per ViewModel lifetime (init is not re-invoked on config change).
-        onEvent(DashboardEvent.GetRemoteStadiums())
+        onEvent(DashboardEvent.GetRemoteStadiums)
     }
 }

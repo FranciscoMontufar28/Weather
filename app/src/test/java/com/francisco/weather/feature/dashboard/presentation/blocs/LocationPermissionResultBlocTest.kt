@@ -1,34 +1,26 @@
 package com.francisco.weather.feature.dashboard.presentation.blocs
 
-import com.francisco.weather.feature.dashboard.domain.usecase.LoadCurrentWeatherUseCase
 import com.francisco.weather.feature.dashboard.presentation.DashboardEvent
 import com.francisco.weather.feature.dashboard.presentation.DashboardState
 import com.francisco.weather.feature.forecast.domain.model.ForecastData
-import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
 class LocationPermissionResultBlocTest {
 
-    private lateinit var loadCurrentWeather: LoadCurrentWeatherUseCase
     private lateinit var bloc: LocationPermissionResultBloc
-
-    private val sampleForecast = mockk<ForecastData>(relaxed = true)
 
     @Before
     fun setUp() {
-        loadCurrentWeather = mockk()
-        bloc = LocationPermissionResultBloc(loadCurrentWeather)
+        bloc = LocationPermissionResultBloc()
     }
 
     @Test
-    fun `granted true sets permission, clears isApproxLocation, no IP load`() = runTest {
+    fun `granted true — sets locationPermissionGranted true and locationResolved`() = runTest {
         var state = DashboardState(isApproxLocation = true)
         bloc.handleEvent(
             event = DashboardEvent.LocationPermissionResult(granted = true),
@@ -37,41 +29,36 @@ class LocationPermissionResultBlocTest {
 
         assertTrue(state.locationPermissionGranted)
         assertTrue(state.locationResolved)
-        assertFalse(state.isApproxLocation)
-        coVerify(exactly = 0) { loadCurrentWeather(any()) }
     }
 
     @Test
-    fun `granted false with no weather triggers IP fallback load`() = runTest {
-        coEvery { loadCurrentWeather("auto:ip") } returns Result.success(sampleForecast)
-
+    fun `granted false — sets locationPermissionGranted false and locationResolved`() = runTest {
         var state = DashboardState()
         bloc.handleEvent(
             event = DashboardEvent.LocationPermissionResult(granted = false),
             updateState = { reducer -> state = reducer(state) },
         )
 
-        coVerify(exactly = 1) { loadCurrentWeather("auto:ip") }
         assertFalse(state.locationPermissionGranted)
         assertTrue(state.locationResolved)
-        // currentWeather is NOT written by the bloc — the observeCachedWeather() collector
-        // in DashboardViewModel is the single writer; it will push the value once Room emits.
-        assertNull(state.currentWeather)
-        assertTrue(state.isApproxLocation)
+        // isApproxLocation is now owned by LoadCurrentWeatherBloc via ResolvedWeather.isApproximate.
+        // This bloc only sets permission flags; weather re-fetch is triggered by the screen effect.
+        assertFalse(state.isApproxLocation)
     }
 
     @Test
-    fun `granted false but weather already loaded — no IP fallback, isApprox set true`() = runTest {
+    fun `does not modify currentWeather or isLoadingWeather`() = runTest {
         val existingForecast = mockk<ForecastData>(relaxed = true)
-        var state = DashboardState(currentWeather = existingForecast)
+        var state = DashboardState(currentWeather = existingForecast, isLoadingWeather = true)
         bloc.handleEvent(
             event = DashboardEvent.LocationPermissionResult(granted = false),
             updateState = { reducer -> state = reducer(state) },
         )
 
-        coVerify(exactly = 0) { loadCurrentWeather(any()) }
+        // Bloc only owns permission flags — weather state is owned by the use case / observer
+        assertTrue(state.currentWeather === existingForecast)
+        assertTrue(state.isLoadingWeather)
         assertFalse(state.locationPermissionGranted)
         assertTrue(state.locationResolved)
-        assertTrue(state.isApproxLocation)
     }
 }

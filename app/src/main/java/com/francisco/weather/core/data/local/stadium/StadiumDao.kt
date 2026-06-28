@@ -21,14 +21,6 @@ interface StadiumDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAllIgnore(entities: List<StadiumEntity>)
 
-    /** Returns the timestamp of the most recent weather fetch, or null if none yet. */
-    @Query("SELECT MAX(weatherUpdatedAt) FROM world_cup_stadiums")
-    suspend fun lastWeatherUpdate(): Long?
-
-    /** Returns the timestamp of the most recent sports fetch, or null if none yet. */
-    @Query("SELECT MAX(sportsUpdatedAt) FROM world_cup_stadiums")
-    suspend fun lastSportsUpdate(): Long?
-
     /** Updates only the weather columns for a single stadium row. */
     @Query(
         """UPDATE world_cup_stadiums

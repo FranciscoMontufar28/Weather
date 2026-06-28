@@ -2,15 +2,11 @@ package com.francisco.weather.feature.dashboard.presentation
 
 import android.Manifest
 import android.content.Context
-import android.util.Log
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.LocationManager
 import android.os.Build
-import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
@@ -39,13 +35,9 @@ import com.francisco.weather.core.ui.components.SkyScaffold
 import com.francisco.weather.core.ui.sky.rememberSkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 import com.francisco.weather.feature.dashboard.presentation.composables.DashboardTopBar
+import com.francisco.weather.feature.dashboard.presentation.composables.rememberPromptEnableGps
 import com.francisco.weather.feature.dashboard.presentation.composables.screens.DashboardLandscape
 import com.francisco.weather.feature.dashboard.presentation.composables.screens.DashboardPortrait
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
-import com.google.android.gms.location.Priority
 
 @Composable
 fun DashboardScreen(
@@ -64,56 +56,25 @@ fun DashboardScreen(
     // condition.text arrives in the newly selected language (via ApiKeyInterceptor's lang= param).
     val language = LocalLocaleController.current.language
     // previousLanguage distinguishes the initial composition from a real language change.
-    // init{} owns the initial stadium sync; this effect only re-syncs on actual language changes.
-    // Without this guard, GetRemoteStadiums runs twice on startup (init + this effect), causing a
-    // TTL race where both reads see lastSports==null and both issue 16+16 concurrent fetches.
+    // init{} owns the initial stadium sync; this effect only re-syncs on actual language changes
+    // to avoid a redundant double-sync on startup (init + this effect).
     var previousLanguage by remember { mutableStateOf(language) }
-    LaunchedEffect(language) {
-        // Weather always reloads: on initial composition it provides the IP-fallback baseline;
-        // on language change it re-fetches so condition.text arrives in the new locale.
-        val q = viewModel.resolvedLocationQuery ?: "auto:ip"
-        val changed = language != previousLanguage
-        Log.d("magnus", "language effect → lang=$language prev=$previousLanguage resolved=${viewModel.resolvedLocationQuery} q=$q changed=$changed")
-        viewModel.onEvent(DashboardEvent.LoadCurrentWeather(q))
-        if (changed) {
+    // Merged effect: re-fetches weather on language change AND on permission/GPS state changes.
+    // The use case resolves GPS vs IP internally — the screen never builds the query string.
+    LaunchedEffect(language, state.locationPermissionGranted, state.isGpsEnabled) {
+        viewModel.onEvent(DashboardEvent.LoadCurrentWeather)
+        if (language != previousLanguage) {
             previousLanguage = language
-            // Force-bypass TTL so stadium condition.text also re-localizes ("Sunny" → "Soleado").
-            viewModel.onEvent(DashboardEvent.GetRemoteStadiums(force = true))
+            // Re-sync stadiums so condition.text re-localizes ("Sunny" → "Soleado").
+            viewModel.onEvent(DashboardEvent.GetRemoteStadiums)
         }
     }
 
-    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
-
-    val gpsSettingsLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { /* GPS state refreshed by ON_RESUME observer */ }
-
-    // Pide activar los servicios de ubicación del dispositivo. En éxito (ya activos, o el usuario
-    // los enciende en el diálogo del sistema) despacha GpsStateChanged(true), que re-ejecuta el
-    // efecto GPS y dispara el forecast con coordenadas precisas.
+    // Pide activar los servicios de ubicación; en éxito dispara GpsStateChanged(true), que
+    // re-ejecuta el efecto GPS y lanza el forecast con coordenadas precisas.
     // Declarado ANTES de permissionLauncher para evitar referencia adelantada.
-    val promptEnableGps: () -> Unit = {
-        Log.d("magnus", "promptEnableGps → checking location settings")
-        val req = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L).build()
-        val settingsReq = LocationSettingsRequest.Builder().addLocationRequest(req).build()
-        LocationServices.getSettingsClient(context)
-            .checkLocationSettings(settingsReq)
-            .addOnSuccessListener {
-                Log.d("magnus", "promptEnableGps → settings satisfied → GpsStateChanged(true)")
-                viewModel.onEvent(DashboardEvent.GpsStateChanged(true))
-            }
-            .addOnFailureListener { ex ->
-                if (ex is ResolvableApiException) {
-                    Log.d("magnus", "promptEnableGps → needs resolution, launching system dialog")
-                    try {
-                        gpsSettingsLauncher.launch(IntentSenderRequest.Builder(ex.resolution).build())
-                    } catch (_: Exception) {
-                        context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                    }
-                } else {
-                    context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                }
-            }
+    val promptEnableGps = rememberPromptEnableGps {
+        viewModel.onEvent(DashboardEvent.GpsStateChanged(true))
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -122,7 +83,6 @@ fun DashboardScreen(
         viewModel.onEvent(DashboardEvent.LocationPermissionResult(granted))
         if (granted) {
             val gpsOn = context.isGpsEnabled()
-            Log.d("magnus", "permission GRANTED → gpsOn=$gpsOn")
             viewModel.onEvent(DashboardEvent.GpsStateChanged(gpsOn))
             // Permiso recién concedido pero GPS apagado → pedir activarlo sin exigir un segundo
             // toque. Al activarlo, ON_RESUME despacha GpsStateChanged(true) → fetch con GPS.
@@ -144,43 +104,6 @@ fun DashboardScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
-    LaunchedEffect(state.locationPermissionGranted, state.isGpsEnabled) {
-        Log.d("magnus", "GPS LaunchedEffect → permissionGranted=${state.locationPermissionGranted} gpsEnabled=${state.isGpsEnabled} currentWeather=${state.currentWeather?.locationName ?: "null"} isLoading=${state.isLoadingWeather}")
-        // Guard removed: currentWeather == null was blocking GPS updates after IP fallback.
-        // We always fetch the GPS location when permission + GPS are active so that:
-        // 1. GPS overrides the IP-based location with the accurate one.
-        // 2. resolvedLocationQuery is stored in the VM for language-change re-fetches.
-        if (state.locationPermissionGranted && state.isGpsEnabled) {
-            Log.d("magnus", "GPS LaunchedEffect → requesting location...")
-            @Suppress("MissingPermission")
-            fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
-                .addOnSuccessListener { loc ->
-                    val q = if (loc != null) "${loc.latitude},${loc.longitude}" else null
-                    if (q != null) {
-                        viewModel.onLocationResolved(q)
-                        viewModel.onEvent(DashboardEvent.LoadCurrentWeather(q))
-                    } else {
-                        fusedLocationClient.lastLocation.addOnSuccessListener { last ->
-                            if (last != null) {
-                                val lq = "${last.latitude},${last.longitude}"
-                                viewModel.onLocationResolved(lq)
-                                viewModel.onEvent(DashboardEvent.LoadCurrentWeather(lq))
-                            }
-                        }
-                    }
-                }
-                .addOnFailureListener {
-                    fusedLocationClient.lastLocation.addOnSuccessListener { last ->
-                        if (last != null) {
-                            val lq = "${last.latitude},${last.longitude}"
-                            viewModel.onLocationResolved(lq)
-                            viewModel.onEvent(DashboardEvent.LoadCurrentWeather(lq))
-                        }
-                    }
-                }
-        }
-    }
-
     val onUseLocation: () -> Unit = {
         when {
             !state.locationPermissionGranted -> {
@@ -191,8 +114,7 @@ fun DashboardScreen(
     }
 
     val onMyLocationForecast: () -> Unit = {
-        val q = viewModel.resolvedLocationQuery ?: state.currentWeather?.locationName
-        q?.let { onOpenForecast(it) }
+        state.currentWeather?.locationName?.let(onOpenForecast)
     }
     val onRecentForecast: (RecentSearch) -> Unit = { onOpenForecast(it.name) }
     val onClearRecents: () -> Unit = { viewModel.onEvent(DashboardEvent.ClearRecents) }

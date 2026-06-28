@@ -1,5 +1,6 @@
 package com.francisco.weather.feature.dashboard.presentation.blocs
 
+import com.francisco.weather.feature.dashboard.domain.model.ResolvedWeather
 import com.francisco.weather.feature.dashboard.domain.usecase.LoadCurrentWeatherUseCase
 import com.francisco.weather.feature.dashboard.presentation.DashboardEvent
 import com.francisco.weather.feature.dashboard.presentation.DashboardState
@@ -28,12 +29,12 @@ class LoadCurrentWeatherBlocTest {
     }
 
     @Test
-    fun `success — bloc does NOT set currentWeather (observer owns it) and keeps isLoadingWeather`() = runTest {
-        coEvery { loadCurrentWeather("Bogota") } returns Result.success(sampleForecast)
+    fun `success with GPS fix — bloc does NOT set currentWeather and marks isApproxLocation false`() = runTest {
+        coEvery { loadCurrentWeather() } returns Result.success(ResolvedWeather(sampleForecast, isApproximate = false))
 
         var state = DashboardState()
         bloc.handleEvent(
-            event = DashboardEvent.LoadCurrentWeather("Bogota"),
+            event = DashboardEvent.LoadCurrentWeather,
             updateState = { reducer -> state = reducer(state) },
         )
 
@@ -48,12 +49,12 @@ class LoadCurrentWeatherBlocTest {
     }
 
     @Test
-    fun `auto ip query sets isApproxLocation true on success`() = runTest {
-        coEvery { loadCurrentWeather("auto:ip") } returns Result.success(sampleForecast)
+    fun `success with IP fallback — sets isApproxLocation true`() = runTest {
+        coEvery { loadCurrentWeather() } returns Result.success(ResolvedWeather(sampleForecast, isApproximate = true))
 
         var state = DashboardState()
         bloc.handleEvent(
-            event = DashboardEvent.LoadCurrentWeather("auto:ip"),
+            event = DashboardEvent.LoadCurrentWeather,
             updateState = { reducer -> state = reducer(state) },
         )
 
@@ -65,11 +66,11 @@ class LoadCurrentWeatherBlocTest {
 
     @Test
     fun `failure sets weatherErrorRes and clears loading`() = runTest {
-        coEvery { loadCurrentWeather(any()) } returns Result.failure(RuntimeException("timeout"))
+        coEvery { loadCurrentWeather() } returns Result.failure(RuntimeException("timeout"))
 
         var state = DashboardState()
         bloc.handleEvent(
-            event = DashboardEvent.LoadCurrentWeather("Bogota"),
+            event = DashboardEvent.LoadCurrentWeather,
             updateState = { reducer -> state = reducer(state) },
         )
 

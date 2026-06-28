@@ -18,31 +18,22 @@ class LoadCurrentWeatherBloc(
         event: DashboardEvent.LoadCurrentWeather,
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,
     ) {
-        loadWeatherInto(event.locationQuery, loadCurrentWeather, updateState)
+        Log.d("magnus", "loadWeather START")
+        updateState { it.copy(isLoadingWeather = true, weatherErrorRes = null) }
+        loadCurrentWeather().fold(
+            onSuccess = { resolved ->
+                Log.d("magnus", "loadWeather SUCCESS → location=${resolved.forecast.locationName}, isApprox=${resolved.isApproximate}")
+                updateState { it.copy(isApproxLocation = resolved.isApproximate) }
+            },
+            onFailure = { error ->
+                Log.d("magnus", "loadWeather FAILURE error=${error.message}")
+                updateState {
+                    it.copy(
+                        isLoadingWeather = false,
+                        weatherErrorRes  = error.toErrorRes(R.string.error_weather_load),
+                    )
+                }
+            },
+        )
     }
-}
-
-internal suspend fun loadWeatherInto(
-    locationQuery: String,
-    loadCurrentWeather: LoadCurrentWeatherUseCase,
-    updateState: suspend ((DashboardState) -> DashboardState) -> Unit,
-) {
-    Log.d("magnus", "loadWeather START query=$locationQuery")
-    updateState { it.copy(isLoadingWeather = true, weatherErrorRes = null) }
-    val isIpFallback = locationQuery == "auto:ip"
-    loadCurrentWeather(locationQuery).fold(
-        onSuccess = { forecast ->
-            Log.d("magnus", "loadWeather SUCCESS → location=${forecast.locationName}, region=${forecast.region}, isIpFallback=$isIpFallback")
-            updateState { it.copy(isApproxLocation = isIpFallback) }
-        },
-        onFailure = { error ->
-            Log.d("magnus", "loadWeather FAILURE query=$locationQuery error=${error.message}")
-            updateState {
-                it.copy(
-                    isLoadingWeather = false,
-                    weatherErrorRes  = error.toErrorRes(R.string.error_weather_load),
-                )
-            }
-        },
-    )
 }

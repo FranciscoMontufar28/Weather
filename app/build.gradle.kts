@@ -96,6 +96,7 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services) // Task.await() interop for FusedLocation
 
     // DI - Dagger2
     implementation(libs.dagger)

@@ -1,6 +1,8 @@
 package com.francisco.weather.feature.dashboard.di
 
+import com.francisco.weather.feature.dashboard.data.DeviceLocationProvider
 import com.francisco.weather.feature.dashboard.data.StadiumRemoteDataSource
+import com.francisco.weather.feature.dashboard.domain.LocationProvider
 import com.francisco.weather.feature.dashboard.domain.usecase.ClearRecentSearchesUseCase
 import com.francisco.weather.feature.dashboard.domain.usecase.LoadCurrentWeatherUseCase
 import com.francisco.weather.feature.dashboard.domain.usecase.SyncStadiumsUseCase
@@ -22,6 +24,10 @@ object DashboardModule {
 
     @Provides
     @Singleton
+    fun provideLocationProvider(impl: DeviceLocationProvider): LocationProvider = impl
+
+    @Provides
+    @Singleton
     fun provideLoadCurrentWeatherBloc(
         loadCurrentWeather: LoadCurrentWeatherUseCase,
     ): LoadCurrentWeatherBloc = LoadCurrentWeatherBloc(loadCurrentWeather)
@@ -40,9 +46,8 @@ object DashboardModule {
 
     @Provides
     @Singleton
-    fun provideLocationPermissionResultBloc(
-        loadCurrentWeather: LoadCurrentWeatherUseCase,
-    ): LocationPermissionResultBloc = LocationPermissionResultBloc(loadCurrentWeather)
+    fun provideLocationPermissionResultBloc(): LocationPermissionResultBloc =
+        LocationPermissionResultBloc()
 
     @Provides
     @Singleton

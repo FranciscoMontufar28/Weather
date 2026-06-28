@@ -16,7 +16,7 @@ class GetRemoteStadiumsBloc(
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,
     ) {
         updateState { it.copy(isLoadingStadiums = true) }
-        runCatching { syncStadiums(event.force) }
+        runCatching { syncStadiums() }
         updateState { it.copy(isLoadingStadiums = false) }
     }
 }
