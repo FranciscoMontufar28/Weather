@@ -8,5 +8,5 @@ import javax.inject.Singleton
 class SyncStadiumsUseCase @Inject constructor(
     private val repository: StadiumRepository,
 ) {
-    suspend operator fun invoke() = repository.syncFromRemote()
+    suspend operator fun invoke(force: Boolean = false) = repository.syncFromRemote(force)
 }

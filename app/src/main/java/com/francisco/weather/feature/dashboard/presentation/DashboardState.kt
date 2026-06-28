@@ -1,5 +1,6 @@
 package com.francisco.weather.feature.dashboard.presentation
 
+import androidx.annotation.StringRes
 import com.francisco.weather.core.bloc.BaseState
 import com.francisco.weather.core.domain.recent.RecentSearch
 import com.francisco.weather.feature.dashboard.domain.model.WorldCupStadium
@@ -8,7 +9,8 @@ import com.francisco.weather.feature.forecast.domain.model.ForecastData
 data class DashboardState(
     val currentWeather: ForecastData? = null,
     val isLoadingWeather: Boolean = false,
-    val weatherError: String? = null,
+    /** String resource id for the current weather error, or null. Resolved via stringResource() in the UI. */
+    @StringRes val weatherErrorRes: Int? = null,
     val locationPermissionGranted: Boolean = false,
     val locationResolved: Boolean = false,
     val isGpsEnabled: Boolean = false,

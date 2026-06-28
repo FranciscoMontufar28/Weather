@@ -16,8 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 
@@ -45,7 +47,7 @@ internal fun SearchPill(
                 modifier = Modifier.size(WeatherTheme.IconSize.medium),
             )
             Text(
-                text = "Search for a place",
+                text = stringResource(R.string.dashboard_search_hint),
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
                 color = sky.textMuted,

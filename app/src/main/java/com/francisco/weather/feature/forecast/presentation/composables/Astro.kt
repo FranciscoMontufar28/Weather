@@ -15,8 +15,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 import com.francisco.weather.feature.forecast.domain.model.Astro
@@ -27,14 +29,15 @@ internal fun AstroRow(
     sky: SkyColors,
     modifier: Modifier = Modifier,
 ) {
+    val moonFallback = stringResource(R.string.astro_moon)
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth(),
     ) {
-        AstroItem(icon = Icons.Default.WbSunny, label = "Amanecer", value = astro.sunrise, sky = sky)
-        AstroItem(icon = Icons.Default.WbSunny, label = "Atardecer", value = astro.sunset, sky = sky, iconTint = Color(0xFFFFB74D))
-        AstroItem(icon = Icons.Default.DarkMode, label = astro.moonPhase.ifBlank { "Luna" }, value = "${astro.moonIllumination}%", sky = sky)
+        AstroItem(icon = Icons.Default.WbSunny, label = stringResource(R.string.astro_sunrise), value = astro.sunrise, sky = sky)
+        AstroItem(icon = Icons.Default.WbSunny, label = stringResource(R.string.astro_sunset), value = astro.sunset, sky = sky, iconTint = Color(0xFFFFB74D))
+        AstroItem(icon = Icons.Default.DarkMode, label = astro.moonPhase.ifBlank { moonFallback }, value = "${astro.moonIllumination}%", sky = sky)
     }
 }
 

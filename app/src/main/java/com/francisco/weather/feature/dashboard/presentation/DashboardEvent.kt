@@ -7,8 +7,6 @@ sealed class DashboardEvent : BaseEvent {
     data class LocationPermissionResult(val granted: Boolean) : DashboardEvent()
     data class GpsStateChanged(val enabled: Boolean) : DashboardEvent()
     data object ClearRecents : DashboardEvent()
-    data object GetRemoteStadiums : DashboardEvent()
-    data object ObserveRecents : DashboardEvent()
-    data object ObserveStadiums : DashboardEvent()
-    data object ObserveCachedWeather : DashboardEvent()
+    /** @param force bypass the 5-minute TTL guard so weather re-fetches immediately (e.g. on language change). */
+    data class GetRemoteStadiums(val force: Boolean = false) : DashboardEvent()
 }

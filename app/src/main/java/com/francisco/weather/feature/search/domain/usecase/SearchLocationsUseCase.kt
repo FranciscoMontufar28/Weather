@@ -1,6 +1,9 @@
 package com.francisco.weather.feature.search.domain.usecase
 
+import com.francisco.weather.R
+import com.francisco.weather.core.network.toErrorRes
 import com.francisco.weather.feature.search.domain.SearchRepository
+import com.francisco.weather.feature.search.domain.model.Location
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -11,7 +14,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import com.francisco.weather.feature.search.domain.model.Location
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,7 +46,7 @@ class SearchLocationsUseCase @Inject constructor(
 
     private fun Result<List<Location>>.toResults(): SearchResults =
         fold(
-            onSuccess = { SearchResults.Success(it) },
-            onFailure = { SearchResults.Error(it.message ?: "Error desconocido") },
+            onSuccess  = { SearchResults.Success(it) },
+            onFailure  = { SearchResults.Error(it.toErrorRes(R.string.error_unexpected)) },
         )
 }

@@ -2,6 +2,7 @@ package com.francisco.weather.core.di
 
 import android.content.Context
 import androidx.lifecycle.ViewModelProvider
+import com.francisco.weather.core.i18n.LocaleManager
 import com.francisco.weather.feature.dashboard.di.DashboardModule
 import com.francisco.weather.feature.forecast.di.ForecastModule
 import com.francisco.weather.feature.search.di.SearchModule
@@ -23,6 +24,9 @@ import javax.inject.Singleton
 interface AppComponent {
 
     fun viewModelFactory(): ViewModelProvider.Factory
+
+    /** Provides the singleton [LocaleManager] so MainActivity can wire it into the composition. */
+    fun localeManager(): LocaleManager
 
     @Component.Factory
     interface Factory {

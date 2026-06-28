@@ -24,11 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 import com.francisco.weather.feature.forecast.domain.model.CurrentWeather
@@ -40,7 +42,7 @@ internal fun CurrentWeatherCard(
     sky: SkyColors,
     modifier: Modifier = Modifier,
 ) {
-    val today = forecast.days.firstOrNull()
+    val today   = forecast.days.firstOrNull()
     val current = forecast.current
 
     GlassCard(fill = WeatherTheme.Colors.glassStrong, shape = RoundedCornerShape(WeatherTheme.Radius.large), modifier = modifier.fillMaxWidth()) {
@@ -92,7 +94,12 @@ internal fun CurrentWeatherCard(
             if (today != null) {
                 Spacer(Modifier.height(WeatherTheme.Size.xSmall))
                 Text(
-                    text = "Average ${today.avgTempC.toInt()}°C  ·  H:${today.maxTempC.toInt()}°  L:${today.minTempC.toInt()}°",
+                    text = stringResource(
+                        R.string.forecast_today_summary,
+                        today.avgTempC.toInt(),
+                        today.maxTempC.toInt(),
+                        today.minTempC.toInt(),
+                    ),
                     fontSize = 12.sp,
                     color = sky.textMuted,
                 )
@@ -113,14 +120,14 @@ internal fun MetricsBar(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().padding(WeatherTheme.Size.medium),
         ) {
-            MetricItem(icon = Icons.Default.WaterDrop, value = "${current.humidity}%", label = "Humidity", sky = sky)
-            MetricItem(icon = Icons.Default.Air, value = "${current.windKph.toInt()} km/h", label = "Wind", sky = sky)
-            MetricItem(icon = Icons.Default.Thermostat, value = "${current.feelsLikeC.toInt()}°C", label = "Feels like", sky = sky)
+            MetricItem(icon = Icons.Default.WaterDrop, value = "${current.humidity}%", label = stringResource(R.string.metric_humidity), sky = sky)
+            MetricItem(icon = Icons.Default.Air, value = "${current.windKph.toInt()} km/h", label = stringResource(R.string.metric_wind), sky = sky)
+            MetricItem(icon = Icons.Default.Thermostat, value = "${current.feelsLikeC.toInt()}°C", label = stringResource(R.string.metric_feels_like), sky = sky)
             if (current.uv > 0) {
                 MetricItem(
                     icon = Icons.Default.WbSunny,
                     value = "UV ${current.uv.toInt()}",
-                    label = "Índice UV",
+                    label = stringResource(R.string.metric_uv),
                     sky = sky,
                     tint = uvColor(current.uv),
                 )

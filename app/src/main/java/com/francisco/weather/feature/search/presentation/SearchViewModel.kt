@@ -20,21 +20,21 @@ class SearchViewModel @Inject constructor(
                         SearchResults.Empty -> state.copy(
                             locations = emptyList(),
                             isLoading = false,
-                            error = null,
+                            errorRes  = null,
                         )
                         SearchResults.Loading -> state.copy(
                             isLoading = true,
-                            error = null,
+                            errorRes  = null,
                         )
                         is SearchResults.Success -> state.copy(
                             locations = result.locations,
                             isLoading = false,
-                            error = null,
+                            errorRes  = null,
                         )
                         is SearchResults.Error -> state.copy(
                             locations = emptyList(),
                             isLoading = false,
-                            error = result.message,
+                            errorRes  = result.messageRes,
                         )
                     }
                 }

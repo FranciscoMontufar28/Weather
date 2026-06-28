@@ -23,9 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 
@@ -57,7 +59,7 @@ internal fun ErrorState(
         Text(text = message, fontSize = 15.sp, color = sky.textMuted, textAlign = TextAlign.Center)
         Spacer(Modifier.height(WeatherTheme.Size.large))
         Button(onClick = onRetry, colors = ButtonDefaults.buttonColors(containerColor = WeatherTheme.Colors.glassStroke)) {
-            Text("Reintentar", color = WeatherTheme.Colors.onSky)
+            Text(stringResource(R.string.action_retry), color = WeatherTheme.Colors.onSky)
         }
     }
 }

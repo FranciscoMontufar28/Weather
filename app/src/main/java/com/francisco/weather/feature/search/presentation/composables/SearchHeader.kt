@@ -11,9 +11,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 
@@ -30,20 +32,20 @@ internal fun SearchHeader(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.action_back),
                 tint = WeatherTheme.Colors.onSky,
             )
         }
         Column(verticalArrangement = Arrangement.spacedBy(WeatherTheme.Size.xSmall)) {
             Text(
-                text = "Search location",
+                text = stringResource(R.string.search_title),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = WeatherTheme.Colors.onSky,
                 letterSpacing = (-0.5).sp,
             )
             Text(
-                text = "Find a city to see its forecast",
+                text = stringResource(R.string.search_subtitle),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = sky.textMuted,

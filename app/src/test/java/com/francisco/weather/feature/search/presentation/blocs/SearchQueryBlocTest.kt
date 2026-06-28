@@ -36,14 +36,14 @@ class SearchQueryBlocTest {
 
     @Test
     fun `handleEvent clears error in state`() = runTest {
-        var state = SearchState(error = "previous error")
+        var state = SearchState(errorRes = 1) // any non-null Int represents "has an error"
 
         bloc.handleEvent(
             event = SearchEvent.QueryChanged("Paris"),
             updateState = { reducer -> state = reducer(state) },
         )
 
-        assertNull(state.error)
+        assertNull(state.errorRes)
     }
 
     @Test

@@ -8,8 +8,8 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -54,7 +54,9 @@ class LocationPermissionResultBlocTest {
         coVerify(exactly = 1) { loadCurrentWeather("auto:ip") }
         assertFalse(state.locationPermissionGranted)
         assertTrue(state.locationResolved)
-        assertEquals(sampleForecast, state.currentWeather)
+        // currentWeather is NOT written by the bloc — the observeCachedWeather() collector
+        // in DashboardViewModel is the single writer; it will push the value once Room emits.
+        assertNull(state.currentWeather)
         assertTrue(state.isApproxLocation)
     }
 

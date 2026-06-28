@@ -1,0 +1,73 @@
+<resources>
+
+    <!-- App -->
+    <string name="splash_tagline">App de prueba Bold</string>
+
+    <!-- Actions -->
+    <string name="action_back">Volver</string>
+    <string name="action_clear">Limpiar</string>
+    <string name="action_retry">Reintentar</string>
+
+    <!-- Navigation / screen titles -->
+    <string name="forecast_title">Pronóstico</string>
+
+    <!-- Dashboard — top bar -->
+    <string name="dashboard_greeting_morning">Buenos días</string>
+    <string name="dashboard_greeting_afternoon">Buenas tardes</string>
+    <string name="dashboard_greeting_evening">Buenas noches</string>
+    <string name="dashboard_date_pattern">EEEE, d \'de\' MMMM</string>
+
+    <!-- Dashboard — content -->
+    <string name="dashboard_recent_searches">BÚSQUEDAS RECIENTES</string>
+    <string name="dashboard_search_hint">Busca un lugar</string>
+
+    <!-- Search -->
+    <string name="search_title">Buscar ubicación</string>
+    <string name="search_subtitle">Encuentra una ciudad para ver su pronóstico</string>
+    <string name="search_field_placeholder">Ciudad, país…</string>
+    <string name="search_results_label">RESULTADOS</string>
+    <string name="search_no_results">No se encontraron resultados</string>
+
+    <!-- Forecast -->
+    <string name="forecast_section_3day">Pronóstico de 3 días</string>
+    <string name="forecast_today_summary">Promedio %1$d°C  ·  Máx:%2$d°  Mín:%3$d°</string>
+
+    <!-- Day labels -->
+    <string name="day_today">Hoy</string>
+    <string name="day_tomorrow">Mañana</string>
+
+    <!-- Astro -->
+    <string name="astro_sunrise">Amanecer</string>
+    <string name="astro_sunset">Atardecer</string>
+    <string name="astro_moon">Luna</string>
+
+    <!-- Metrics -->
+    <string name="metric_humidity">Humedad</string>
+    <string name="metric_wind">Viento</string>
+    <string name="metric_feels_like">Sensación</string>
+    <string name="metric_uv">Índice UV</string>
+
+    <!-- Forecast day temp labels -->
+    <string name="forecast_temp_min">Mín</string>
+    <string name="forecast_temp_avg">Prom</string>
+    <string name="forecast_temp_max">Máx</string>
+    <string name="forecast_rain">Lluvia</string>
+
+    <!-- Location / MyLocationCard -->
+    <string name="location_my_location">MI UBICACIÓN</string>
+    <string name="location_approx_ip">📍 Ubicación aproximada (IP)</string>
+    <string name="location_improve_accuracy">Mejorar precisión</string>
+    <string name="location_enable_prompt">No se pudo obtener el clima. Activa la ubicación para ver el pronóstico local.</string>
+    <string name="location_use_location">Usar ubicación</string>
+
+    <!-- Stadiums -->
+    <string name="stadium_section_title">COPA MUNDIAL FIFA 2026</string>
+    <string name="stadium_next_match">⚽ Próximo partido</string>
+
+    <!-- Errors -->
+    <string name="error_network">No se pudo conectar. Revisa tu conexión.</string>
+    <string name="error_unexpected">Ocurrió un error inesperado.</string>
+    <string name="error_forecast_load">Error al cargar el pronóstico.</string>
+    <string name="error_weather_load">Error al cargar el clima.</string>
+
+</resources>

@@ -23,7 +23,7 @@ class SearchQueryBloc(
         event: SearchEvent.QueryChanged,
         updateState: suspend ((SearchState) -> SearchState) -> Unit,
     ) {
-        updateState { it.copy(query = event.query, error = null) }
+        updateState { it.copy(query = event.query, errorRes = null) }
         searchLocations.setQuery(event.query)
     }
 }

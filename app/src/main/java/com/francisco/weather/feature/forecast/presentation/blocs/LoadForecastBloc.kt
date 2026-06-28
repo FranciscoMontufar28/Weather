@@ -1,6 +1,8 @@
 package com.francisco.weather.feature.forecast.presentation.blocs
 
+import com.francisco.weather.R
 import com.francisco.weather.core.bloc.BaseBloc
+import com.francisco.weather.core.network.toErrorRes
 import com.francisco.weather.feature.forecast.domain.usecase.GetForecastUseCase
 import com.francisco.weather.feature.forecast.presentation.ForecastEvent
 import com.francisco.weather.feature.forecast.presentation.ForecastState
@@ -15,17 +17,17 @@ class LoadForecastBloc(
         event: ForecastEvent.Load,
         updateState: suspend ((ForecastState) -> ForecastState) -> Unit,
     ) {
-        updateState { it.copy(isLoading = true, error = null, locationQuery = event.locationQuery) }
+        updateState { it.copy(isLoading = true, errorRes = null, locationQuery = event.locationQuery) }
 
         getForecast(event.locationQuery).fold(
             onSuccess = { forecast ->
-                updateState { it.copy(forecast = forecast, isLoading = false, error = null) }
+                updateState { it.copy(forecast = forecast, isLoading = false, errorRes = null) }
             },
             onFailure = { error ->
                 updateState {
                     it.copy(
                         isLoading = false,
-                        error = error.message ?: "Error al cargar el pronóstico",
+                        errorRes  = error.toErrorRes(R.string.error_forecast_load),
                     )
                 }
             },

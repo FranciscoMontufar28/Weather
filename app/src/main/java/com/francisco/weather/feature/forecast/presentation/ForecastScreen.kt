@@ -10,9 +10,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.francisco.weather.core.di.LocalViewModelFactory
+import com.francisco.weather.core.i18n.LocalLocaleController
 import com.francisco.weather.core.ui.components.SkyScaffold
 import com.francisco.weather.core.ui.components.SkyTopBar
 import com.francisco.weather.core.ui.sky.rememberSkyColors
@@ -35,12 +37,15 @@ fun ForecastScreen(
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    LaunchedEffect(locationQuery) {
+    // Re-fetch whenever the location or the active language changes so condition.text
+    // is returned in the newly selected language (via ApiKeyInterceptor's lang= param).
+    val language = LocalLocaleController.current.language
+    LaunchedEffect(locationQuery, language) {
         viewModel.onEvent(ForecastEvent.Load(locationQuery))
     }
 
-    val forecast = state.forecast
-    val error = state.error
+    val forecast  = state.forecast
+    val errorRes  = state.errorRes
 
     SkyScaffold(
         sky = sky,
@@ -54,14 +59,14 @@ fun ForecastScreen(
         when {
             state.isLoading -> LoadingState(sky = sky)
 
-            error != null && forecast == null -> {
+            errorRes != null && forecast == null -> {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(innerPadding),
                     contentAlignment = Alignment.Center,
                 ) {
                     ErrorState(
-                        message = error,
-                        onRetry = { viewModel.onEvent(ForecastEvent.Load(locationQuery)) },
+                        message = stringResource(errorRes),
+                        onRetry  = { viewModel.onEvent(ForecastEvent.Load(locationQuery)) },
                         sky = sky,
                     )
                 }

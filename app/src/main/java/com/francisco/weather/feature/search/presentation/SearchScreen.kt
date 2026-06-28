@@ -48,8 +48,8 @@ fun SearchScreen(
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(state.error) {
-        if (state.error != null) viewModel.onEvent(SearchEvent.ClearError)
+    LaunchedEffect(state.errorRes) {
+        if (state.errorRes != null) viewModel.onEvent(SearchEvent.ClearError)
     }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()

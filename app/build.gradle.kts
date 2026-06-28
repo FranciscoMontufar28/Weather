@@ -63,11 +63,16 @@ android {
             freeCompilerArgs.add("-opt-in=androidx.compose.animation.ExperimentalSharedTransitionApi")
         }
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
     // Core
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
 
     // Compose BOM — versions resolved from BOM
     implementation(platform(libs.androidx.compose.bom))
@@ -107,6 +112,9 @@ dependencies {
     // Image loading
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    // Lottie
+    implementation(libs.lottie.compose)
 
     // Debug tooling
     debugImplementation(libs.androidx.compose.ui.tooling)

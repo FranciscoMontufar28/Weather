@@ -16,9 +16,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.theme.WeatherTheme
 
 @Composable
@@ -40,14 +42,14 @@ internal fun LandscapeAppBar(
             IconButton(onClick = onBack, modifier = Modifier.size(34.dp)) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver",
+                    contentDescription = stringResource(R.string.action_back),
                     tint = WeatherTheme.Colors.onSky,
                     modifier = Modifier.size(WeatherTheme.IconSize.medium),
                 )
             }
         }
         Text(
-            text = "Forecast",
+            text = stringResource(R.string.forecast_title),
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = WeatherTheme.Colors.onSky,

@@ -23,10 +23,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.domain.recent.RecentSearch
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
@@ -43,14 +45,14 @@ internal fun RecentHeader(
         modifier = modifier.fillMaxWidth(),
     ) {
         Text(
-            text = "RECENT SEARCHES",
+            text = stringResource(R.string.dashboard_recent_searches),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.5.sp,
             color = sky.textMuted,
         )
         Text(
-            text = "Clear",
+            text = stringResource(R.string.action_clear),
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
             color = sky.accent,

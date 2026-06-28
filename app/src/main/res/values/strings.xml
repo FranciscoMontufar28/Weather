@@ -1,3 +1,80 @@
 <resources>
+
+    <!-- App -->
     <string name="app_name">Weather</string>
+    <string name="splash_tagline">Bold test app</string>
+
+    <!-- Actions -->
+    <string name="action_back">Back</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_retry">Retry</string>
+
+    <!-- Navigation / screen titles -->
+    <string name="forecast_title">Forecast</string>
+
+    <!-- Dashboard — top bar -->
+    <string name="dashboard_greeting_morning">Good morning</string>
+    <string name="dashboard_greeting_afternoon">Good afternoon</string>
+    <string name="dashboard_greeting_evening">Good evening</string>
+    <!-- DateTimeFormatter pattern — translatable because Spanish uses a different word order -->
+    <string name="dashboard_date_pattern">EEEE, MMMM d</string>
+
+    <!-- Dashboard — content -->
+    <string name="dashboard_recent_searches">RECENT SEARCHES</string>
+    <string name="dashboard_search_hint">Search for a place</string>
+
+    <!-- Search -->
+    <string name="search_title">Search location</string>
+    <string name="search_subtitle">Find a city to see its forecast</string>
+    <string name="search_field_placeholder">City, country…</string>
+    <string name="search_results_label">RESULTS</string>
+    <string name="search_no_results">No results found</string>
+
+    <!-- Forecast -->
+    <string name="forecast_section_3day">3-Day Forecast</string>
+    <!-- Format: avg°C · H:max° L:min° — wording differs per language -->
+    <string name="forecast_today_summary">Average %1$d°C  ·  H:%2$d°  L:%3$d°</string>
+
+    <!-- Day labels -->
+    <string name="day_today">Today</string>
+    <string name="day_tomorrow">Tomorrow</string>
+
+    <!-- Astro -->
+    <string name="astro_sunrise">Sunrise</string>
+    <string name="astro_sunset">Sunset</string>
+    <string name="astro_moon">Moon</string>
+
+    <!-- Metrics (shared between CurrentWeather and MetricsCard) -->
+    <string name="metric_humidity">Humidity</string>
+    <string name="metric_wind">Wind</string>
+    <string name="metric_feels_like">Feels like</string>
+    <string name="metric_uv">UV Index</string>
+
+    <!-- Forecast day temp labels -->
+    <string name="forecast_temp_min">Min</string>
+    <string name="forecast_temp_avg">Avg</string>
+    <string name="forecast_temp_max">Max</string>
+    <string name="forecast_rain">Rain</string>
+
+    <!-- Location / MyLocationCard -->
+    <string name="location_my_location">MY LOCATION</string>
+    <string name="location_approx_ip">📍 Approximate location (IP)</string>
+    <string name="location_improve_accuracy">Improve accuracy</string>
+    <string name="location_enable_prompt">Couldn\'t get the weather. Turn on location to see your local forecast.</string>
+    <string name="location_use_location">Use location</string>
+
+    <!-- Stadiums -->
+    <string name="stadium_section_title">FIFA WORLD CUP 2026</string>
+    <string name="stadium_next_match">⚽ Next match</string>
+
+    <!-- Language selector — endonyms, never translated -->
+    <string name="language_english" translatable="false">English</string>
+    <string name="language_spanish" translatable="false">Español</string>
+
+    <!-- Errors -->
+    <string name="error_network">Couldn\'t connect. Check your connection.</string>
+    <string name="error_unexpected">Something went wrong.</string>
+    <string name="error_forecast_load">Couldn\'t load the forecast.</string>
+    <string name="error_weather_load">Couldn\'t load the weather.</string>
+
 </resources>

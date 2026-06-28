@@ -7,22 +7,39 @@ import java.util.Locale
 
 internal val DATE_PARSER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
+/**
+ * Converts an ISO date string ("yyyy-MM-dd") to a human-readable day label.
+ *
+ * • Today    → locale-aware string ("Today" / "Hoy")
+ * • Tomorrow → locale-aware string ("Tomorrow" / "Mañana")
+ * • Other    → formatted day name via [Locale.getDefault()] (e.g. "lunes, 15 jun")
+ *
+ * Reads [Locale.getDefault()] at call-time; [LocaleManager.setLanguage] calls
+ * [Locale.setDefault] so this automatically reflects the in-app language selection.
+ */
 internal fun String.toDayLabel(): String = try {
-    val date = LocalDate.parse(this, DATE_PARSER)
-    val today = LocalDate.now()
+    val date   = LocalDate.parse(this, DATE_PARSER)
+    val today  = LocalDate.now()
+    val locale = Locale.getDefault()
     when (date) {
-        today -> "Hoy"
-        today.plusDays(1) -> "Mañana"
-        else -> date.format(DateTimeFormatter.ofPattern("EEEE, d MMM", Locale.forLanguageTag("es")))
+        today              -> if (locale.language == "es") "Hoy"    else "Today"
+        today.plusDays(1)  -> if (locale.language == "es") "Mañana" else "Tomorrow"
+        else -> date.format(DateTimeFormatter.ofPattern("EEEE, d MMM", locale))
             .replaceFirstChar { it.uppercaseChar() }
     }
 } catch (_: Exception) { this }
 
+/**
+ * Short label for horizontal compact cards ("Today" / "Hoy" / abbreviated weekday).
+ * Uses [Locale.getDefault()] so weekday abbreviations auto-localize (Mon → lun).
+ */
 internal fun String.toShortDayLabel(): String = try {
-    val date = LocalDate.parse(this, DATE_PARSER)
+    val date   = LocalDate.parse(this, DATE_PARSER)
+    val locale = Locale.getDefault()
     when (date) {
-        LocalDate.now() -> "Today"
-        else -> date.format(DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH))
+        LocalDate.now() -> if (locale.language == "es") "Hoy" else "Today"
+        else -> date.format(DateTimeFormatter.ofPattern("EEE", locale))
+            .replaceFirstChar { it.uppercaseChar() }
     }
 } catch (_: Exception) { this }
 

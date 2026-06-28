@@ -24,6 +24,10 @@ dagger = "2.55"
 coil = "3.0.4"
 playServicesLocation = "21.3.0"
 room = "2.7.1"
+# AndroidX SplashScreen compat
+coreSplashscreen = "1.0.1"
+# Lottie
+lottie = "6.6.0"
 # Test
 mockk = "1.13.14"
 turbine = "1.2.0"
@@ -65,6 +69,10 @@ play-services-location = { group = "com.google.android.gms", name = "play-servic
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+# AndroidX SplashScreen compat
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
+# Lottie
+lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
 # Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

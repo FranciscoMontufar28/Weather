@@ -12,6 +12,6 @@ class ClearErrorBloc : BaseBloc<SearchEvent.ClearError, SearchState>() {
         event: SearchEvent.ClearError,
         updateState: suspend ((SearchState) -> SearchState) -> Unit,
     ) {
-        updateState { it.copy(error = null) }
+        updateState { it.copy(errorRes = null) }
     }
 }

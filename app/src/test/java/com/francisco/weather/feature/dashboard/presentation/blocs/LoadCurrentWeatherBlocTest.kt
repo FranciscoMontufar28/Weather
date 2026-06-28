@@ -7,7 +7,6 @@ import com.francisco.weather.feature.forecast.domain.model.ForecastData
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -29,7 +28,7 @@ class LoadCurrentWeatherBlocTest {
     }
 
     @Test
-    fun `success updates state with forecast and clears loading`() = runTest {
+    fun `success — bloc does NOT set currentWeather (observer owns it) and keeps isLoadingWeather`() = runTest {
         coEvery { loadCurrentWeather("Bogota") } returns Result.success(sampleForecast)
 
         var state = DashboardState()
@@ -38,9 +37,13 @@ class LoadCurrentWeatherBlocTest {
             updateState = { reducer -> state = reducer(state) },
         )
 
-        assertEquals(sampleForecast, state.currentWeather)
-        assertFalse(state.isLoadingWeather)
-        assertNull(state.weatherError)
+        // currentWeather is written exclusively by the observeCachedWeather() collector —
+        // the bloc must NOT touch it.
+        assertNull(state.currentWeather)
+        // isLoadingWeather is cleared by the observer when Room emits the saved data,
+        // not by the load bloc on success.
+        assertTrue(state.isLoadingWeather)
+        assertNull(state.weatherErrorRes)
         assertFalse(state.isApproxLocation)
     }
 
@@ -55,12 +58,13 @@ class LoadCurrentWeatherBlocTest {
         )
 
         assertTrue(state.isApproxLocation)
-        assertEquals(sampleForecast, state.currentWeather)
-        assertFalse(state.isLoadingWeather)
+        // currentWeather still null — the observer will set it once Room emits
+        assertNull(state.currentWeather)
+        assertTrue(state.isLoadingWeather)
     }
 
     @Test
-    fun `failure sets weatherError and clears loading`() = runTest {
+    fun `failure sets weatherErrorRes and clears loading`() = runTest {
         coEvery { loadCurrentWeather(any()) } returns Result.failure(RuntimeException("timeout"))
 
         var state = DashboardState()
@@ -71,7 +75,6 @@ class LoadCurrentWeatherBlocTest {
 
         assertFalse(state.isLoadingWeather)
         assertNull(state.currentWeather)
-        assertNotNull(state.weatherError)
-        assertTrue(state.weatherError!!.isNotBlank())
+        assertNotNull(state.weatherErrorRes)
     }
 }

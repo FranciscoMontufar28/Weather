@@ -9,29 +9,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 internal fun DashboardTopBar(
     sky: SkyColors,
     modifier: Modifier = Modifier,
 ) {
-    val greeting = remember {
-        when {
-            LocalTime.now().hour < 12 -> "Good morning"
-            LocalTime.now().hour < 18 -> "Good afternoon"
-            else -> "Good evening"
-        }
+    // Greeting: no remember needed — stringResource() is already reactive to locale changes.
+    val greeting = when {
+        LocalTime.now().hour < 12 -> stringResource(R.string.dashboard_greeting_morning)
+        LocalTime.now().hour < 18 -> stringResource(R.string.dashboard_greeting_afternoon)
+        else                      -> stringResource(R.string.dashboard_greeting_evening)
     }
-    val dateText = remember {
-        LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.ENGLISH))
+
+    // Date: re-computed when locale or the date pattern string changes.
+    val locale      = LocalConfiguration.current.locales[0]
+    val datePattern = stringResource(R.string.dashboard_date_pattern)
+    val dateText    = remember(locale, datePattern) {
+        LocalDate.now()
+            .format(DateTimeFormatter.ofPattern(datePattern, locale))
+            .replaceFirstChar { it.uppercaseChar() }
     }
 
     Row(
@@ -53,5 +60,8 @@ internal fun DashboardTopBar(
                 color = WeatherTheme.Colors.onSky,
             )
         }
+
+        // Language selector: collapsed flag → dropdown with all available languages.
+        LanguageFlagSelector()
     }
 }

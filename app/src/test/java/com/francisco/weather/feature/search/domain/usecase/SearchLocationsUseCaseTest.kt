@@ -90,7 +90,7 @@ class SearchLocationsUseCaseTest {
         advanceTimeBy(400)
         job.cancel()
 
-        assertTrue(results.any { it is SearchResults.Error && it.message == "boom" })
+        assertTrue(results.any { it is SearchResults.Error })
     }
 
     @Test

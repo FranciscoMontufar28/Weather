@@ -1,5 +1,6 @@
 package com.francisco.weather.feature.dashboard.data
 
+import android.util.Log
 import com.francisco.weather.core.data.local.stadium.StadiumDao
 import com.francisco.weather.core.data.local.stadium.StadiumEntity
 import com.francisco.weather.core.network.WeatherApi
@@ -26,7 +27,7 @@ class StadiumRepositoryImpl @Inject constructor(
     override fun observeStadiums(): Flow<List<WorldCupStadium>> =
         dao.observeAll().map { entities -> entities.map { it.toDomain() } }
 
-    override suspend fun syncFromRemote() {
+    override suspend fun syncFromRemote(force: Boolean) {
         val base = remote.fetch()
 
         // Insert base rows without overwriting any cached weather/sports data
@@ -34,9 +35,10 @@ class StadiumRepositoryImpl @Inject constructor(
 
         val now = System.currentTimeMillis()
 
-        // TTL guard: skip weather fetch if refreshed less than 5 min ago
+        // TTL guard: skip weather fetch if refreshed less than 5 min ago.
+        // force=true bypasses the guard so conditionText re-fetches after a language change.
         val lastWeather = dao.lastWeatherUpdate()
-        if (lastWeather == null || now - lastWeather >= WEATHER_TTL_MS) {
+        if (force || lastWeather == null || now - lastWeather >= WEATHER_TTL_MS) {
             // Fetch weather for all stadiums concurrently
             coroutineScope {
                 base.map { stadium ->
@@ -59,6 +61,7 @@ class StadiumRepositoryImpl @Inject constructor(
 
         // TTL guard: skip sports fetch if refreshed less than 5 min ago
         val lastSports = dao.lastSportsUpdate()
+        Log.d("magnus", "syncFromRemote sports TTL check: lastSports=$lastSports now=$now delta=${if (lastSports != null) now - lastSports else -1}ms threshold=${SPORTS_TTL_MS}ms → fetch=${lastSports == null || now - lastSports >= SPORTS_TTL_MS}")
         if (lastSports == null || now - lastSports >= SPORTS_TTL_MS) {
             // Fetch sports for all stadiums concurrently with lat,lon → city fallback
             coroutineScope {
@@ -66,8 +69,21 @@ class StadiumRepositoryImpl @Inject constructor(
                     async {
                         runCatching {
                             val latLonQuery = "${stadium.latitude},${stadium.longitude}"
-                            val event = api.sports(latLonQuery).nextEvent()
-                                ?: api.sports(stadium.city).nextEvent()
+                            Log.d("magnus", "sports FETCH [${stadium.name}] query=$latLonQuery")
+                            val eventByLatLon = api.sports(latLonQuery).nextEvent()
+                            val event = if (eventByLatLon != null) {
+                                Log.d("magnus", "sports HIT latLon [${stadium.name}] → ${eventByLatLon.match} (${eventByLatLon.tournament})")
+                                eventByLatLon
+                            } else {
+                                Log.d("magnus", "sports MISS latLon [${stadium.name}] → fallback city=${stadium.city}")
+                                val eventByCity = api.sports(stadium.city).nextEvent()
+                                if (eventByCity != null) {
+                                    Log.d("magnus", "sports HIT city [${stadium.name}] → ${eventByCity.match} (${eventByCity.tournament})")
+                                } else {
+                                    Log.d("magnus", "sports MISS city [${stadium.name}] → no event, skipping")
+                                }
+                                eventByCity
+                            }
 
                             if (event != null) {
                                 dao.updateSports(
@@ -78,6 +94,8 @@ class StadiumRepositoryImpl @Inject constructor(
                                     ts = now,
                                 )
                             }
+                        }.onFailure { e ->
+                            Log.d("magnus", "sports ERROR [${stadium.name}] ${e.message}")
                         }
                         // runCatching absorbs individual failures — other stadiums still update
                     }

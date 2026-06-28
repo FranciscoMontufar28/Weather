@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 import com.francisco.weather.feature.forecast.domain.model.DayWeather
@@ -91,9 +93,9 @@ internal fun DayGlassCard(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                TempChip("Mín", day.minTempC, sky)
-                TempChip("Prom", day.avgTempC, sky)
-                TempChip("Máx", day.maxTempC, sky)
+                TempChip(stringResource(R.string.forecast_temp_min), day.minTempC, sky)
+                TempChip(stringResource(R.string.forecast_temp_avg), day.avgTempC, sky)
+                TempChip(stringResource(R.string.forecast_temp_max), day.maxTempC, sky)
                 if (day.chanceOfRain > 0) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
@@ -108,7 +110,7 @@ internal fun DayGlassCard(
                             fontWeight = FontWeight.SemiBold,
                             color = WeatherTheme.Colors.onSky,
                         )
-                        Text(text = "Lluvia", fontSize = 12.sp, color = sky.textMuted)
+                        Text(text = stringResource(R.string.forecast_rain), fontSize = 12.sp, color = sky.textMuted)
                     }
                 }
             }

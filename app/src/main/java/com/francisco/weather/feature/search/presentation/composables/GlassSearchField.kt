@@ -23,11 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.sky.computeSkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
@@ -75,7 +77,7 @@ internal fun GlassSearchField(
                     Box(modifier = Modifier.weight(1f)) {
                         if (query.isEmpty()) {
                             Text(
-                                text = "City, country…",
+                                text = stringResource(R.string.search_field_placeholder),
                                 fontSize = 17.sp,
                                 color = sky.textMuted,
                             )
@@ -94,7 +96,7 @@ internal fun GlassSearchField(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Clear",
+                        contentDescription = stringResource(R.string.action_clear),
                         tint = sky.textMuted,
                         modifier = Modifier.size(WeatherTheme.IconSize.medium),
                     )

@@ -18,10 +18,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -29,9 +32,11 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 import com.francisco.weather.feature.dashboard.domain.model.WorldCupStadium
+import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
@@ -45,7 +50,7 @@ internal fun WorldCupStadiumsSection(
         modifier = modifier,
     ) {
         Text(
-            text = "FIFA WORLD CUP 2026",
+            text = stringResource(R.string.stadium_section_title),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 1.5.sp,
@@ -67,6 +72,15 @@ private fun StadiumCard(
     stadium: WorldCupStadium,
     sky: SkyColors,
 ) {
+    // Derive the country name from the ISO 3166-1 alpha-2 country code so it auto-localizes
+    // when the user switches language (e.g. "United States" → "Estados Unidos").
+    val locale = LocalConfiguration.current.locales[0]
+    val countryName = remember(stadium.countryCode, locale) {
+        Locale.Builder().setRegion(stadium.countryCode).build()
+            .getDisplayCountry(locale)
+            .takeIf { it.isNotBlank() } ?: stadium.country
+    }
+
     Card(
         shape = RoundedCornerShape(WeatherTheme.Radius.medium),
         colors = CardDefaults.cardColors(containerColor = WeatherTheme.Colors.glassFill),
@@ -87,7 +101,10 @@ private fun StadiumCard(
             )
             Column(
                 verticalArrangement = Arrangement.spacedBy(WeatherTheme.Size.xSmall),
-                modifier = Modifier.padding(horizontal = WeatherTheme.Size.large, vertical = WeatherTheme.Size.medium),
+                modifier = Modifier.padding(
+                    horizontal = WeatherTheme.Size.large,
+                    vertical = WeatherTheme.Size.medium
+                ),
             ) {
                 Text(
                     text = stadium.name,
@@ -98,7 +115,7 @@ private fun StadiumCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 Text(
-                    text = "${stadium.city}, ${stadium.country}",
+                    text = "${stadium.city}, $countryName",
                     fontSize = 11.sp,
                     color = sky.textMuted,
                     maxLines = 1,
@@ -133,7 +150,7 @@ private fun StadiumCard(
                         modifier = Modifier.padding(vertical = WeatherTheme.Size.small),
                     )
                     Text(
-                        text = "⚽ Próximo partido",
+                        text = stringResource(R.string.stadium_next_match),
                         fontSize = 9.sp,
                         color = sky.textMuted,
                         fontWeight = FontWeight.SemiBold,
@@ -176,4 +193,6 @@ private fun String.formatMatchStart(): String = try {
         val dateParts = parts[0].split("-")
         "${dateParts[2]}/${dateParts[1]} ${parts[1]}"
     } else this
-} catch (_: Exception) { this }
+} catch (_: Exception) {
+    this
+}

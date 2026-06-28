@@ -8,17 +8,11 @@ import com.francisco.weather.feature.dashboard.presentation.blocs.GetRemoteStadi
 import com.francisco.weather.feature.dashboard.presentation.blocs.GpsStateChangedBloc
 import com.francisco.weather.feature.dashboard.presentation.blocs.LoadCurrentWeatherBloc
 import com.francisco.weather.feature.dashboard.presentation.blocs.LocationPermissionResultBloc
-import com.francisco.weather.feature.dashboard.presentation.blocs.ObserveCachedWeatherBloc
-import com.francisco.weather.feature.dashboard.presentation.blocs.ObserveRecentsBloc
-import com.francisco.weather.feature.dashboard.presentation.blocs.ObserveStadiumsBloc
 
 class DashboardBlocFactory(
     loadCurrentWeatherBloc: LoadCurrentWeatherBloc,
     clearRecentsBloc: ClearRecentsBloc,
     getRemoteStadiumsBloc: GetRemoteStadiumsBloc,
-    observeRecentsBloc: ObserveRecentsBloc,
-    observeStadiumsBloc: ObserveStadiumsBloc,
-    observeCachedWeatherBloc: ObserveCachedWeatherBloc,
     locationPermissionResultBloc: LocationPermissionResultBloc,
 ) : BaseBlocFactory<DashboardEvent, DashboardState>() {
 
@@ -26,9 +20,6 @@ class DashboardBlocFactory(
         DashboardEvent.LoadCurrentWeather::class with loadCurrentWeatherBloc,
         DashboardEvent.ClearRecents::class with clearRecentsBloc,
         DashboardEvent.GetRemoteStadiums::class with getRemoteStadiumsBloc,
-        DashboardEvent.ObserveRecents::class with observeRecentsBloc,
-        DashboardEvent.ObserveStadiums::class with observeStadiumsBloc,
-        DashboardEvent.ObserveCachedWeather::class with observeCachedWeatherBloc,
         DashboardEvent.LocationPermissionResult::class with locationPermissionResultBloc,
         DashboardEvent.GpsStateChanged::class with GpsStateChangedBloc(),
     )

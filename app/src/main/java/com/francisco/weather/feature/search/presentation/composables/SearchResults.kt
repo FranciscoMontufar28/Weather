@@ -28,10 +28,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.francisco.weather.R
 import com.francisco.weather.core.ui.sky.SkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 import com.francisco.weather.feature.search.domain.model.Location
@@ -81,7 +83,7 @@ internal fun ResultsSectionLabel(
     modifier: Modifier = Modifier,
 ) {
     Text(
-        text = "RESULTS",
+        text = stringResource(R.string.search_results_label),
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         color = sky.textMuted,

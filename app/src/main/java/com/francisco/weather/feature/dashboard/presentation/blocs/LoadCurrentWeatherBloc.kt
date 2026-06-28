@@ -1,6 +1,9 @@
 package com.francisco.weather.feature.dashboard.presentation.blocs
 
+import android.util.Log
+import com.francisco.weather.R
 import com.francisco.weather.core.bloc.BaseBloc
+import com.francisco.weather.core.network.toErrorRes
 import com.francisco.weather.feature.dashboard.domain.usecase.LoadCurrentWeatherUseCase
 import com.francisco.weather.feature.dashboard.presentation.DashboardEvent
 import com.francisco.weather.feature.dashboard.presentation.DashboardState
@@ -24,24 +27,20 @@ internal suspend fun loadWeatherInto(
     loadCurrentWeather: LoadCurrentWeatherUseCase,
     updateState: suspend ((DashboardState) -> DashboardState) -> Unit,
 ) {
-    updateState { it.copy(isLoadingWeather = true, weatherError = null) }
+    Log.d("magnus", "loadWeather START query=$locationQuery")
+    updateState { it.copy(isLoadingWeather = true, weatherErrorRes = null) }
     val isIpFallback = locationQuery == "auto:ip"
     loadCurrentWeather(locationQuery).fold(
         onSuccess = { forecast ->
-            updateState {
-                it.copy(
-                    currentWeather = forecast,
-                    isLoadingWeather = false,
-                    weatherError = null,
-                    isApproxLocation = isIpFallback,
-                )
-            }
+            Log.d("magnus", "loadWeather SUCCESS → location=${forecast.locationName}, region=${forecast.region}, isIpFallback=$isIpFallback")
+            updateState { it.copy(isApproxLocation = isIpFallback) }
         },
         onFailure = { error ->
+            Log.d("magnus", "loadWeather FAILURE query=$locationQuery error=${error.message}")
             updateState {
                 it.copy(
                     isLoadingWeather = false,
-                    weatherError = error.message ?: "Error al cargar el clima",
+                    weatherErrorRes  = error.toErrorRes(R.string.error_weather_load),
                 )
             }
         },

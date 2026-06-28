@@ -12,6 +12,6 @@ class ClearForecastErrorBloc : BaseBloc<ForecastEvent.ClearError, ForecastState>
         event: ForecastEvent.ClearError,
         updateState: suspend ((ForecastState) -> ForecastState) -> Unit,
     ) {
-        updateState { it.copy(error = null) }
+        updateState { it.copy(errorRes = null) }
     }
 }

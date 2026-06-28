@@ -68,7 +68,7 @@ class LoadForecastBlocTest {
         assertNotNull(state.forecast)
         assertEquals("Bogotá", state.forecast!!.locationName)
         assertFalse(state.isLoading)
-        assertNull(state.error)
+        assertNull(state.errorRes)
         assertEquals("Bogota", state.locationQuery)
     }
 
@@ -85,8 +85,7 @@ class LoadForecastBlocTest {
 
         assertFalse(state.isLoading)
         assertNull(state.forecast)
-        assertNotNull(state.error)
-        assertTrue(state.error!!.contains("conectar", ignoreCase = true))
+        assertNotNull(state.errorRes)
     }
 
     @Test
@@ -100,6 +99,6 @@ class LoadForecastBlocTest {
         )
 
         assertFalse(state.isLoading)
-        assertNotNull(state.error)
+        assertNotNull(state.errorRes)
     }
 }

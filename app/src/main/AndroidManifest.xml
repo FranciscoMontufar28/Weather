@@ -19,6 +19,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:theme="@style/Theme.Weather.Splash"
             android:configChanges="orientation|screenSize|screenLayout"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
