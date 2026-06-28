@@ -5,8 +5,10 @@ import com.francisco.weather.core.bloc.BlocViewModel
 import com.francisco.weather.feature.search.domain.usecase.SearchLocationsUseCase
 import com.francisco.weather.feature.search.domain.usecase.SearchResults
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+@HiltViewModel
 class SearchViewModel @Inject constructor(
     override val factory: SearchBlocFactory,
     private val searchLocations: SearchLocationsUseCase,

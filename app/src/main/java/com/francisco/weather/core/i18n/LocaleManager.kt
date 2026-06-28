@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import java.util.Locale
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,11 +24,11 @@ import javax.inject.Singleton
  * there is no JVM signature clash between the generated `setLanguage` setter and the public
  * method of the same name.
  *
- * Injected as a @Singleton: the same instance is wired into [AppComponent] and exposed
- * via [LocalLocaleController] to composables without prop-drilling.
+ * Injected as a @Singleton: the same instance is wired into [dagger.hilt.components.SingletonComponent]
+ * and exposed via [LocalLocaleController] to composables without prop-drilling.
  */
 @Singleton
-class LocaleManager @Inject constructor(context: Context) {
+class LocaleManager @Inject constructor(@ApplicationContext context: Context) {
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 

@@ -12,6 +12,7 @@ import com.francisco.weather.feature.dashboard.domain.model.Coordinates
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.tasks.await
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,7 +29,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class DeviceLocationProvider @Inject constructor(
-    private val context: Context,
+    @ApplicationContext private val context: Context,
 ) : LocationProvider {
 
     private val fused = LocationServices.getFusedLocationProviderClient(context)

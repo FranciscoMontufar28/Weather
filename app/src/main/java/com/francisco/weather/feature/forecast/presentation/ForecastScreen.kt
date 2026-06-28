@@ -12,8 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.francisco.weather.core.di.LocalViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.francisco.weather.core.i18n.LocalLocaleController
 import com.francisco.weather.core.ui.components.SkyScaffold
 import com.francisco.weather.core.ui.components.SkyTopBar
@@ -29,8 +28,7 @@ fun ForecastScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val factory = LocalViewModelFactory.current
-    val viewModel: ForecastViewModel = viewModel(factory = factory)
+    val viewModel: ForecastViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sky = rememberSkyColors()
 

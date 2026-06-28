@@ -27,8 +27,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.francisco.weather.core.di.LocalViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.francisco.weather.core.domain.recent.RecentSearch
 import com.francisco.weather.core.i18n.LocalLocaleController
 import com.francisco.weather.core.ui.components.SkyScaffold
@@ -45,8 +44,7 @@ fun DashboardScreen(
     onOpenForecast: (locationQuery: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val factory = LocalViewModelFactory.current
-    val viewModel: DashboardViewModel = viewModel(factory = factory)
+    val viewModel: DashboardViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sky = rememberSkyColors()
     val context = LocalContext.current

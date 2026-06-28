@@ -22,8 +22,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.francisco.weather.core.di.LocalViewModelFactory
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.francisco.weather.core.ui.components.SkyScaffold
 import com.francisco.weather.core.ui.sky.rememberSkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
@@ -38,8 +37,7 @@ fun SearchScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val factory = LocalViewModelFactory.current
-    val viewModel: SearchViewModel = viewModel(factory = factory)
+    val viewModel: SearchViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val sky = rememberSkyColors()
     var queryText by rememberSaveable { mutableStateOf("") }

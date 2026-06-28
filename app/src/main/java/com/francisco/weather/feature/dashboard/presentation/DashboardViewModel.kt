@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.francisco.weather.core.bloc.BlocViewModel
 import com.francisco.weather.feature.dashboard.domain.usecase.ObserveDashboardUseCase
 import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+@HiltViewModel
 class DashboardViewModel @Inject constructor(
     override val factory: DashboardBlocFactory,
     private val observeDashboard: ObserveDashboardUseCase,

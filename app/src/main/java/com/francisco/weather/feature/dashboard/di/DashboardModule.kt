@@ -13,8 +13,11 @@ import com.francisco.weather.feature.dashboard.presentation.blocs.LoadCurrentWea
 import com.francisco.weather.feature.dashboard.presentation.blocs.LocationPermissionResultBloc
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+@InstallIn(SingletonComponent::class)
 @Module
 object DashboardModule {
 

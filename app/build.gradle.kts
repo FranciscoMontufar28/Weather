@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -98,9 +99,13 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services) // Task.await() interop for FusedLocation
 
-    // DI - Dagger2
-    implementation(libs.dagger)
-    ksp(libs.dagger.compiler)
+    // DI - Hilt
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.hilt.navigation.compose)
+    // Hilt-generated Java code references @CanIgnoreReturnValue; needs to be
+    // on the javac classpath explicitly with JDK 17 / AGP 9.x.
+    compileOnly(libs.error.prone.annotations)
 
     // Location
     implementation(libs.play.services.location)
