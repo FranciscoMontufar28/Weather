@@ -1,9 +1,9 @@
 package com.francisco.weather.feature.dashboard.presentation.blocs
 
-import android.util.Log
 import com.francisco.weather.R
 import com.francisco.weather.core.bloc.BaseBloc
 import com.francisco.weather.core.network.toErrorRes
+import timber.log.Timber
 import com.francisco.weather.feature.dashboard.domain.usecase.LoadCurrentWeatherUseCase
 import com.francisco.weather.feature.dashboard.presentation.DashboardEvent
 import com.francisco.weather.feature.dashboard.presentation.DashboardState
@@ -18,15 +18,13 @@ class LoadCurrentWeatherBloc(
         event: DashboardEvent.LoadCurrentWeather,
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,
     ) {
-        Log.d("magnus", "loadWeather START")
         updateState { it.copy(isLoadingWeather = true, weatherErrorRes = null) }
         loadCurrentWeather().fold(
             onSuccess = { resolved ->
-                Log.d("magnus", "loadWeather SUCCESS → location=${resolved.forecast.locationName}, isApprox=${resolved.isApproximate}")
                 updateState { it.copy(isApproxLocation = resolved.isApproximate) }
             },
             onFailure = { error ->
-                Log.d("magnus", "loadWeather FAILURE error=${error.message}")
+                Timber.tag(tag).e(error, "Failed to load current weather")
                 updateState {
                     it.copy(
                         isLoadingWeather = false,

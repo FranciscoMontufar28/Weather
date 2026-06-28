@@ -2,6 +2,7 @@ package com.francisco.weather.feature.search.domain.usecase
 
 import com.francisco.weather.R
 import com.francisco.weather.core.network.toErrorRes
+import timber.log.Timber
 import com.francisco.weather.feature.search.domain.SearchRepository
 import com.francisco.weather.feature.search.domain.model.Location
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,6 +48,9 @@ class SearchLocationsUseCase @Inject constructor(
     private fun Result<List<Location>>.toResults(): SearchResults =
         fold(
             onSuccess  = { SearchResults.Success(it) },
-            onFailure  = { SearchResults.Error(it.toErrorRes(R.string.error_unexpected)) },
+            onFailure  = {
+                Timber.e(it, "Search locations failed")
+                SearchResults.Error(it.toErrorRes(R.string.error_unexpected))
+            },
         )
 }

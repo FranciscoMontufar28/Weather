@@ -3,6 +3,7 @@ package com.francisco.weather.feature.forecast.presentation.blocs
 import com.francisco.weather.R
 import com.francisco.weather.core.bloc.BaseBloc
 import com.francisco.weather.core.network.toErrorRes
+import timber.log.Timber
 import com.francisco.weather.feature.forecast.domain.usecase.GetForecastUseCase
 import com.francisco.weather.feature.forecast.presentation.ForecastEvent
 import com.francisco.weather.feature.forecast.presentation.ForecastState
@@ -24,6 +25,7 @@ class LoadForecastBloc(
                 updateState { it.copy(forecast = forecast, isLoading = false, errorRes = null) }
             },
             onFailure = { error ->
+                Timber.tag(tag).e(error, "Failed to load forecast")
                 updateState {
                     it.copy(
                         isLoading = false,

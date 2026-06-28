@@ -30,6 +30,8 @@ room = "2.7.1"
 coreSplashscreen = "1.0.1"
 # Lottie
 lottie = "6.6.0"
+# Logging
+timber = "5.0.1"
 # Test
 mockk = "1.13.14"
 turbine = "1.2.0"
@@ -78,6 +80,8 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 # Lottie
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie" }
+# Logging
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 # Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

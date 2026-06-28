@@ -2,10 +2,11 @@ package com.francisco.weather.feature.search.data
 
 import com.francisco.weather.core.network.WeatherApi
 import com.francisco.weather.core.network.WeatherError
-import com.francisco.weather.feature.search.data.dto.toDomain
+import com.francisco.weather.feature.search.data.mapper.toDomain
 import com.francisco.weather.feature.search.domain.SearchRepository
 import com.francisco.weather.feature.search.domain.model.Location
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
@@ -26,6 +27,7 @@ class SearchRepositoryImpl @Inject constructor(
             }
         },
         onFailure = { cause ->
+            Timber.e(cause, "Search API call failed")
             Result.failure(
                 when (cause) {
                     is IOException -> WeatherError.Network(cause)

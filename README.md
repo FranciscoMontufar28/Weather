@@ -53,6 +53,7 @@ Además de los requisitos mínimos del enunciado, incluye: pronóstico horario, 
 | Async | Kotlin Coroutines + Flow | 1.10.1 |
 | Imágenes | Coil 3 (coil-network-okhttp) | 3.0.4 |
 | Animaciones | Lottie Compose | 6.6.0 |
+| Logging | Timber | 5.0.1 |
 | Localización | Play Services Location (FusedLocationProvider) | 21.3.0 |
 | Build | Android Gradle Plugin | 9.1.1 |
 | SDK mínimo / objetivo | API 26 (Android 8) / API 36 | — |
@@ -65,10 +66,15 @@ La aplicación implementa **Clean Architecture** con la presentación organizada
 
 ```
 feature/<nombre>/
-├── data/          # Fuentes de datos: DTOs Retrofit, DAOs Room, mappers, implementaciones de repositorio
+├── data/
+│   ├── dto/       # DTOs de Retrofit (respuestas crudas de la API, anotadas con @Serializable)
+│   ├── mapper/    # Funciones de extensión puras que convierten DTO → modelo de dominio
+│   └── *Impl.kt  # Implementaciones de repositorio (orquestan dto + mapper + Room/API)
 ├── domain/        # Modelos puros, interfaces de repositorio, use cases
 └── presentation/  # ViewModel, Blocs, Composables, estados y eventos de UI
 ```
+
+Los **mappers** son objetos sin estado: funciones `fun XDto.toDomain(): X` que no conocen ni Room ni Retrofit. Esto permite testearlos de forma aislada y mantiene los repositorios libres de lógica de transformación.
 
 ### Motor BLoC/MVI
 
@@ -113,10 +119,13 @@ flowchart TD
 
     subgraph DATA["Datos"]
         REPO["Implementaciones de repositorio<br/>ForecastRepositoryImpl · SearchRepositoryImpl<br/>StadiumRepositoryImpl · CachedWeatherRepositoryImpl"]
-        API["WeatherApi · Retrofit<br/>api.weatherapi.com/v1<br/>search.json · forecast.json"]
+        MAP["Mappers · data/mapper/<br/>ForecastMapper · LocationMapper · StadiumMapper"]
+        DTO["DTOs · data/dto/<br/>ForecastResponseDto · LocationDto · SportsResponseDto"]
+        API["WeatherApi · Retrofit<br/>api.weatherapi.com/v1<br/>search.json · forecast.json · sports.json"]
         ROOM["Room DB<br/>recent · stadium · cachedWeather"]
         LOC["DeviceLocationProvider<br/>FusedLocationProviderClient"]
-        REPO --> API
+        REPO --> MAP --> DTO
+        REPO --> API --> DTO
         REPO --> ROOM
         REPO --> LOC
     end
@@ -127,6 +136,11 @@ flowchart TD
     HILT["Hilt DI<br/>NetworkModule · DatabaseModule<br/>DashboardModule · SearchModule · ForecastModule"]
     HILT -. inyecta .-> VM
     HILT -. inyecta .-> REPO
+
+    LOG["Timber · Logging<br/>BaseBloc.tag → errores con stacktrace<br/>onFailure en repos · use cases · blocs"]
+    BLOC -. loguea errores .-> LOG
+    REPO -. loguea errores .-> LOG
+    UC -. loguea errores .-> LOG
 ```
 
 ---
@@ -176,37 +190,49 @@ app/src/main/java/com/francisco/weather/
 ├── WeatherApplication.kt        # @HiltAndroidApp
 │
 ├── core/
-│   ├── bloc/                    # Motor BLoC: BaseBloc, BlocViewModel, BaseBlocFactory, BlocMap, BaseEvent, BaseState
+│   ├── bloc/                    # Motor BLoC: BaseBloc (con Timber.tag), BlocViewModel, BaseBlocFactory, BlocMap
 │   ├── data/
 │   │   ├── local/               # Room: WeatherDatabase · DAOs + Entities (recent, stadium, cachedWeather)
 │   │   └── recent/              # RecentSearchRepositoryImpl
 │   ├── di/                      # NetworkModule (Retrofit, OkHttp, WeatherApi) · DatabaseModule (Room, repos)
 │   ├── domain/recent/           # RecentSearch (modelo) · RecentSearchRepository (interfaz)
 │   ├── i18n/                    # AppLanguage, AppLocale, LocaleManager, LocalLocaleController
-│   ├── network/                 # WeatherApi (interfaz Retrofit) · ApiKeyInterceptor · WeatherError · ErrorText
-│   └── ui/                      # WeatherTheme · Color · Type · sky/ · components/
+│   ├── network/                 # WeatherApi · ApiKeyInterceptor · WeatherError · ErrorText
+│   └── ui/
+│       ├── components/          # SkyScaffold (gradiente de cielo compartido)
+│       ├── sky/                 # SkyTheme · rememberSkyColors() · lerpSky()
+│       └── theme/               # WeatherTheme · Color · Type · WeatherColors
 │
 ├── feature/
-│   ├── splash/presentation/     # SplashScreen (Lottie + delay)
+│   ├── splash/presentation/     # SplashScreen (animación Lottie local · splash_weather.lottie)
 │   │
 │   ├── dashboard/
-│   │   ├── data/                # StadiumRepositoryImpl · CachedWeatherRepositoryImpl · DeviceLocationProvider · DTOs
+│   │   ├── data/
+│   │   │   ├── dto/             # SportsResponseDto
+│   │   │   ├── mapper/          # StadiumMapper (DTO → WorldCupStadium)
+│   │   │   └── *Impl.kt         # StadiumRepositoryImpl · CachedWeatherRepositoryImpl · DeviceLocationProvider
 │   │   ├── di/                  # DashboardModule
 │   │   ├── domain/              # usecase/ (ObserveDashboard · LoadCurrentWeather · SyncStadiums · ClearRecents)
-│   │   │                        # LocationProvider (interfaz) · StadiumRepository · CachedWeatherRepository
-│   │   └── presentation/        # DashboardViewModel · Blocs (5) · DashboardScreen · portrait + landscape
+│   │   │                        # model/ (DashboardData · WorldCupStadium · ResolvedWeather · Coordinates)
+│   │   └── presentation/        # DashboardViewModel · Blocs (5) · composables/ · screens/ (portrait + landscape)
 │   │
 │   ├── search/
-│   │   ├── data/                # SearchRepositoryImpl · LocationDto
+│   │   ├── data/
+│   │   │   ├── dto/             # LocationDto
+│   │   │   ├── mapper/          # LocationMapper (DTO → Location)
+│   │   │   └── SearchRepositoryImpl.kt
 │   │   ├── di/                  # SearchModule
-│   │   ├── domain/              # usecase/ (SearchLocations · SearchResults sealed) · Location (modelo)
-│   │   └── presentation/        # SearchViewModel · Blocs (3) · SearchScreen · portrait + landscape
+│   │   ├── domain/              # usecase/ (SearchLocations · SearchResults sealed) · model/Location
+│   │   └── presentation/        # SearchViewModel · Blocs (3) · composables/ · screens/ (portrait + landscape)
 │   │
 │   └── forecast/
-│       ├── data/                # ForecastRepositoryImpl · ForecastResponseDto · mappers
+│       ├── data/
+│       │   ├── dto/             # ForecastResponseDto
+│       │   ├── mapper/          # ForecastMapper (DTO → ForecastData)
+│       │   └── ForecastRepositoryImpl.kt
 │       ├── di/                  # ForecastModule
-│       ├── domain/              # usecase/ (GetForecast) · ForecastData (modelo)
-│       └── presentation/        # ForecastViewModel · Blocs (2) · ForecastScreen · portrait + landscape
+│       ├── domain/              # usecase/ (GetForecast) · model/ (ForecastData · DayWeather · HourWeather · Astro…)
+│       └── presentation/        # ForecastViewModel · Blocs (2) · composables/ · screens/ (portrait + landscape)
 │
 └── navigation/
     ├── WeatherDestinations.kt   # Rutas constantes: splash · dashboard · search · forecast/{locationQuery}
@@ -291,6 +317,33 @@ El `DashboardScreen` combina tres fuentes de datos (búsquedas recientes, estadi
 ### i18n en tiempo de ejecución
 
 El idioma cambia sin reiniciar la app: `LocaleManager` combina `SharedPreferences` para persistencia con un `mutableStateOf` de Compose para recomponer todo el árbol UI al instante. El interceptor de red añade `lang=es|en` a cada petición para que el campo `condition.text` llegue localizado directamente desde la API.
+
+### Logging y observabilidad con Timber
+
+Timber reemplaza los llamados directos a `android.util.Log`. El árbol se planta una sola vez en `WeatherApplication.onCreate()` guardado por `BuildConfig.DEBUG` (en release es un no-op sin código extra en cada llamada).
+
+El logging de errores está cableado en dos niveles complementarios:
+
+- **`BaseBloc.run()`** — captura cualquier excepción que escape de `handleEvent` y la loguea con `Timber.tag(tag).e(...)`, usando el `override val tag` del bloc concreto (ej. `LoadForecastBloc`). Luego relanza para que `BlocViewModel.handleError` también reciba el error. Así el stacktrace queda etiquetado con el nombre exacto del bloc que falló.
+- **Callbacks `onFailure`** — en repos (`ForecastRepositoryImpl`, `SearchRepositoryImpl`), use cases (`SearchLocationsUseCase`) y blocs (`LoadForecastBloc`, `LoadCurrentWeatherBloc`), `Timber.e(cause, "…")` registra el error en el momento en que se transforma en `WeatherError` tipado. Los blocs usan `Timber.tag(tag)` para mantener la trazabilidad.
+
+En tests unitarios no se planta ningún árbol, por lo que `Timber` es un no-op y no rompe ningún test existente.
+
+### Gradiente de cielo dinámico según la hora
+
+El fondo de todas las pantallas refleja el momento del día mediante un gradiente de tres colores (`top`, `mid`, `bottom`) que se interpola suavemente entre 8 fotogramas clave basados en la hora del reloj del dispositivo:
+
+| Rango horario | Estado del cielo |
+|:---:|:---:|
+| 00:00 – 05:00 | Noche |
+| 05:00 – 07:00 | Amanecer |
+| 07:00 – 17:00 | Día |
+| 17:00 – 20:00 | Atardecer |
+| 20:00 – 24:00 | Noche |
+
+La transición entre etapas se realiza mediante interpolación lineal de color (`lerpSky`), lo que produce cambios graduales de 1-2 horas sin saltos. Adicionalmente, `starOpacity` controla la visibilidad de estrellas decorativas en pantalla (0 de día → 1 de noche).
+
+Para evitar recomposiciones excesivas, `rememberSkyColors()` agrupa la hora en buckets de 5 minutos: el estado solo cambia cada 5 minutos reales, no en cada frame. El gradiente se aplica en `SkyScaffold` (`core/ui/components/`) y es compartido por Dashboard, Search y Forecast.
 
 ---
 

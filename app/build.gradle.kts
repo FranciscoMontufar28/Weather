@@ -122,6 +122,9 @@ dependencies {
     // Lottie
     implementation(libs.lottie.compose)
 
+    // Logging
+    implementation(libs.timber)
+
     // Debug tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

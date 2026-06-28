@@ -1,15 +1,24 @@
 package com.francisco.weather.core.bloc
 
+import kotlinx.coroutines.CancellationException
+import timber.log.Timber
+
 abstract class BaseBloc<Event : BaseEvent, State : BaseState> {
 
     abstract val tag: String
 
     @Suppress("UNCHECKED_CAST")
     suspend fun run(event: Any, updateState: suspend ((State) -> State) -> Unit) {
+        val castedEvent = event as? Event ?: return
         try {
-            val castedEvent = event as? Event ?: return
             handleEvent(castedEvent, updateState)
         } catch (_: ClassCastException) {
+            // Subtipo de evento equivocado por type erasure — ignorar silenciosamente.
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.tag(tag).e(e, "Error handling %s", castedEvent::class.simpleName)
+            throw e
         }
     }
 

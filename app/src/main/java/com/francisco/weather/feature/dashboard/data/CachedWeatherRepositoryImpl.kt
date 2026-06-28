@@ -1,6 +1,5 @@
 package com.francisco.weather.feature.dashboard.data
 
-import android.util.Log
 import com.francisco.weather.core.data.local.weather.CachedWeatherDao
 import com.francisco.weather.core.data.local.weather.CachedWeatherEntity
 import com.francisco.weather.feature.dashboard.domain.CachedWeatherRepository
@@ -23,13 +22,10 @@ class CachedWeatherRepositoryImpl @Inject constructor(
                 } catch (_: Exception) {
                     null
                 }
-            }.also { forecast ->
-                Log.d("magnus", "observeCached EMIT → location=${forecast?.locationName ?: "null"}, region=${forecast?.region ?: "null"}")
             }
         }
 
     override suspend fun save(data: ForecastData) {
-        Log.d("magnus", "cache SAVE → location=${data.locationName}, region=${data.region}")
         dao.upsert(
             CachedWeatherEntity(
                 json = json.encodeToString(data),

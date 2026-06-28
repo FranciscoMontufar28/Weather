@@ -7,17 +7,11 @@ import java.time.format.DateTimeFormatter
 @Serializable
 data class SportsResponseDto(
     val football: List<SportEventDto> = emptyList(),
-    val cricket: List<SportEventDto> = emptyList(),
-    val golf: List<SportEventDto> = emptyList(),
 ) {
-    /**
-     * Returns the next upcoming event across all sports,
-     * filtering to only events that start now or in the future.
-     */
     fun nextEvent(): SportEventDto? {
         val fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
         val now = LocalDateTime.now()
-        return (football + cricket + golf)
+        return football
             .filter {
                 runCatching { LocalDateTime.parse(it.start, fmt) >= now }.getOrDefault(true)
             }
