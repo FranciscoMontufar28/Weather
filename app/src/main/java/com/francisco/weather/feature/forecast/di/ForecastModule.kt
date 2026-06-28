@@ -2,6 +2,7 @@ package com.francisco.weather.feature.forecast.di
 
 import com.francisco.weather.feature.forecast.data.ForecastRepositoryImpl
 import com.francisco.weather.feature.forecast.domain.ForecastRepository
+import com.francisco.weather.feature.forecast.domain.usecase.GetForecastUseCase
 import com.francisco.weather.feature.forecast.presentation.ForecastBlocFactory
 import com.francisco.weather.feature.forecast.presentation.blocs.LoadForecastBloc
 import dagger.Binds
@@ -20,8 +21,8 @@ abstract class ForecastModule {
 
         @Provides
         @Singleton
-        fun provideLoadForecastBloc(repository: ForecastRepository): LoadForecastBloc =
-            LoadForecastBloc(repository)
+        fun provideLoadForecastBloc(getForecast: GetForecastUseCase): LoadForecastBloc =
+            LoadForecastBloc(getForecast)
 
         @Provides
         @Singleton

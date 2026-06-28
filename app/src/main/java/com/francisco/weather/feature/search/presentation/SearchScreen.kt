@@ -29,8 +29,8 @@ import com.francisco.weather.core.ui.sky.rememberSkyColors
 import com.francisco.weather.core.ui.theme.WeatherTheme
 import com.francisco.weather.feature.search.domain.model.Location
 import com.francisco.weather.feature.search.presentation.composables.SearchHeader
-import com.francisco.weather.feature.search.presentation.composables.SearchLandscape
-import com.francisco.weather.feature.search.presentation.composables.SearchPortrait
+import com.francisco.weather.feature.search.presentation.composables.screens.SearchLandscape
+import com.francisco.weather.feature.search.presentation.composables.screens.SearchPortrait
 
 @Composable
 fun SearchScreen(
@@ -65,7 +65,11 @@ fun SearchScreen(
                     onBack = onNavigateBack,
                     modifier = Modifier
                         .windowInsetsPadding(WindowInsets.statusBars)
-                        .padding(start = WeatherTheme.Size.xLarge, end = WeatherTheme.Size.xLarge, top = WeatherTheme.Size.medium),
+                        .padding(
+                            start = WeatherTheme.Size.xLarge,
+                            end = WeatherTheme.Size.xLarge,
+                            top = WeatherTheme.Size.medium
+                        ),
                 )
             }
         },
@@ -115,5 +119,19 @@ fun SearchScreen(
 @Preview(name = "Portrait · Day", showBackground = true, widthDp = 412, heightDp = 917)
 @Composable
 private fun SearchPortraitPreview() {
-    WeatherTheme { Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF123A72), Color(0xFF245CA8), Color(0xFF4E92DA))))) }
+    WeatherTheme {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color(0xFF123A72),
+                            Color(0xFF245CA8),
+                            Color(0xFF4E92DA)
+                        )
+                    )
+                )
+        )
+    }
 }

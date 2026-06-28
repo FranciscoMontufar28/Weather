@@ -5,6 +5,7 @@ import com.francisco.weather.feature.search.data.SearchRepositoryImpl
 import com.francisco.weather.feature.search.domain.SearchRepository
 import com.francisco.weather.feature.search.presentation.SearchBlocFactory
 import com.francisco.weather.feature.search.presentation.blocs.RecordRecentBloc
+import com.francisco.weather.feature.search.domain.usecase.SearchLocationsUseCase
 import com.francisco.weather.feature.search.presentation.blocs.SearchQueryBloc
 import dagger.Binds
 import dagger.Module
@@ -22,8 +23,8 @@ abstract class SearchModule {
 
         @Provides
         @Singleton
-        fun provideSearchQueryBloc(repository: SearchRepository): SearchQueryBloc =
-            SearchQueryBloc(repository)
+        fun provideSearchQueryBloc(searchLocations: SearchLocationsUseCase): SearchQueryBloc =
+            SearchQueryBloc(searchLocations)
 
         @Provides
         @Singleton

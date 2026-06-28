@@ -2,7 +2,6 @@ package com.francisco.weather.feature.forecast.presentation.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,6 +15,8 @@ import com.francisco.weather.feature.forecast.domain.model.CurrentWeather
 import com.francisco.weather.feature.forecast.domain.model.DayWeather
 import com.francisco.weather.feature.forecast.domain.model.ForecastData
 import com.francisco.weather.feature.forecast.domain.model.HourWeather
+import com.francisco.weather.feature.forecast.presentation.composables.screens.ForecastLandscape
+import com.francisco.weather.feature.forecast.presentation.composables.screens.ForecastPortrait
 
 private val PREVIEW_ASTRO = Astro("05:47 AM", "06:10 PM", "Waxing Gibbous", 93)
 

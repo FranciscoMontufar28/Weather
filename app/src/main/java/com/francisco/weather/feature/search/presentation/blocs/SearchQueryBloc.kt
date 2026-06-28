@@ -1,20 +1,20 @@
 package com.francisco.weather.feature.search.presentation.blocs
 
 import com.francisco.weather.core.bloc.BaseBloc
-import com.francisco.weather.feature.search.domain.SearchRepository
+import com.francisco.weather.feature.search.domain.usecase.SearchLocationsUseCase
 import com.francisco.weather.feature.search.presentation.SearchEvent
 import com.francisco.weather.feature.search.presentation.SearchState
-import kotlinx.coroutines.delay
 
 /**
  * Handles [SearchEvent.QueryChanged].
  *
- * Updates the query immediately, debounces 300 ms, then calls the repo.
- * The debounce works because the coroutine launched per event is cancelled by
- * [SearchViewModel.onEvent] before a new one starts.
+ * Updates the query in state immediately and forwards the raw query to
+ * [SearchLocationsUseCase]. The use case owns the reactive pipeline
+ * (debounce, distinctUntilChanged, flatMapLatest) — no delay or network call here.
+ * Results are collected in SearchViewModel.init and mapped back to state there.
  */
 class SearchQueryBloc(
-    private val repository: SearchRepository,
+    private val searchLocations: SearchLocationsUseCase,
 ) : BaseBloc<SearchEvent.QueryChanged, SearchState>() {
 
     override val tag = "SearchQueryBloc"
@@ -23,40 +23,7 @@ class SearchQueryBloc(
         event: SearchEvent.QueryChanged,
         updateState: suspend ((SearchState) -> SearchState) -> Unit,
     ) {
-        val query = event.query.trim()
-
-        // Reflect the query in state immediately
-        updateState { it.copy(query = query, error = null) }
-
-        if (query.isBlank()) {
-            updateState { it.copy(locations = emptyList(), isLoading = false) }
-            return
-        }
-
-        // Debounce: wait 300 ms. If a new event arrives, this coroutine is cancelled.
-        delay(300L)
-
-        updateState { it.copy(isLoading = true) }
-
-        repository.search(query).fold(
-            onSuccess = { locations ->
-                updateState {
-                    it.copy(
-                        locations = locations,
-                        isLoading = false,
-                        error = null,
-                    )
-                }
-            },
-            onFailure = { error ->
-                updateState {
-                    it.copy(
-                        locations = emptyList(),
-                        isLoading = false,
-                        error = error.message ?: "Error desconocido",
-                    )
-                }
-            },
-        )
+        updateState { it.copy(query = event.query, error = null) }
+        searchLocations.setQuery(event.query)
     }
 }

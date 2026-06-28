@@ -6,20 +6,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.francisco.weather.core.di.LocalViewModelFactory
 import com.francisco.weather.core.ui.components.SkyScaffold
 import com.francisco.weather.core.ui.components.SkyTopBar
 import com.francisco.weather.core.ui.sky.rememberSkyColors
 import com.francisco.weather.feature.forecast.presentation.composables.ErrorState
-import com.francisco.weather.feature.forecast.presentation.composables.ForecastLandscape
-import com.francisco.weather.feature.forecast.presentation.composables.ForecastPortrait
 import com.francisco.weather.feature.forecast.presentation.composables.LoadingState
+import com.francisco.weather.feature.forecast.presentation.composables.screens.ForecastLandscape
+import com.francisco.weather.feature.forecast.presentation.composables.screens.ForecastPortrait
 
 @Composable
 fun ForecastScreen(

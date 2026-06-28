@@ -8,4 +8,7 @@ sealed class DashboardEvent : BaseEvent {
     data class GpsStateChanged(val enabled: Boolean) : DashboardEvent()
     data object ClearRecents : DashboardEvent()
     data object GetRemoteStadiums : DashboardEvent()
+    data object ObserveRecents : DashboardEvent()
+    data object ObserveStadiums : DashboardEvent()
+    data object ObserveCachedWeather : DashboardEvent()
 }

@@ -1,20 +1,17 @@
 package com.francisco.weather.feature.dashboard.presentation.blocs
 
 import com.francisco.weather.core.bloc.BaseBloc
-import com.francisco.weather.feature.dashboard.domain.usecase.ClearRecentSearchesUseCase
 import com.francisco.weather.feature.dashboard.presentation.DashboardEvent
 import com.francisco.weather.feature.dashboard.presentation.DashboardState
 
-class ClearRecentsBloc(
-    private val clearRecents: ClearRecentSearchesUseCase,
-) : BaseBloc<DashboardEvent.ClearRecents, DashboardState>() {
+class GpsStateChangedBloc : BaseBloc<DashboardEvent.GpsStateChanged, DashboardState>() {
 
-    override val tag = "ClearRecentsBloc"
+    override val tag = "GpsStateChangedBloc"
 
     override suspend fun handleEvent(
-        event: DashboardEvent.ClearRecents,
+        event: DashboardEvent.GpsStateChanged,
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,
     ) {
-        clearRecents()
+        updateState { it.copy(isGpsEnabled = event.enabled) }
     }
 }

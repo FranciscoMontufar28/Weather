@@ -1,12 +1,12 @@
 package com.francisco.weather.feature.forecast.presentation.blocs
 
 import com.francisco.weather.core.network.WeatherError
-import com.francisco.weather.feature.forecast.domain.ForecastRepository
 import com.francisco.weather.feature.forecast.domain.model.Astro
 import com.francisco.weather.feature.forecast.domain.model.Condition
 import com.francisco.weather.feature.forecast.domain.model.CurrentWeather
 import com.francisco.weather.feature.forecast.domain.model.DayWeather
 import com.francisco.weather.feature.forecast.domain.model.ForecastData
+import com.francisco.weather.feature.forecast.domain.usecase.GetForecastUseCase
 import com.francisco.weather.feature.forecast.presentation.ForecastEvent
 import com.francisco.weather.feature.forecast.presentation.ForecastState
 import io.mockk.coEvery
@@ -23,7 +23,7 @@ import java.io.IOException
 
 class LoadForecastBlocTest {
 
-    private lateinit var repository: ForecastRepository
+    private lateinit var getForecast: GetForecastUseCase
     private lateinit var bloc: LoadForecastBloc
 
     private val sampleForecast = ForecastData(
@@ -51,13 +51,13 @@ class LoadForecastBlocTest {
 
     @Before
     fun setUp() {
-        repository = mockk()
-        bloc = LoadForecastBloc(repository)
+        getForecast = mockk()
+        bloc = LoadForecastBloc(getForecast)
     }
 
     @Test
     fun `successful load updates state with forecast data`() = runTest {
-        coEvery { repository.getForecast("Bogota") } returns Result.success(sampleForecast)
+        coEvery { getForecast("Bogota") } returns Result.success(sampleForecast)
 
         var state = ForecastState()
         bloc.handleEvent(
@@ -75,7 +75,7 @@ class LoadForecastBlocTest {
     @Test
     fun `network failure sets error and clears loading`() = runTest {
         val cause = IOException("timeout")
-        coEvery { repository.getForecast(any()) } returns Result.failure(WeatherError.Network(cause))
+        coEvery { getForecast(any()) } returns Result.failure(WeatherError.Network(cause))
 
         var state = ForecastState()
         bloc.handleEvent(
@@ -91,7 +91,7 @@ class LoadForecastBlocTest {
 
     @Test
     fun `http error sets error with message`() = runTest {
-        coEvery { repository.getForecast(any()) } returns Result.failure(WeatherError.Http(400, "Bad Request"))
+        coEvery { getForecast(any()) } returns Result.failure(WeatherError.Http(400, "Bad Request"))
 
         var state = ForecastState()
         bloc.handleEvent(

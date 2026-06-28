@@ -1,12 +1,12 @@
 package com.francisco.weather.feature.forecast.presentation.blocs
 
 import com.francisco.weather.core.bloc.BaseBloc
-import com.francisco.weather.feature.forecast.domain.ForecastRepository
+import com.francisco.weather.feature.forecast.domain.usecase.GetForecastUseCase
 import com.francisco.weather.feature.forecast.presentation.ForecastEvent
 import com.francisco.weather.feature.forecast.presentation.ForecastState
 
 class LoadForecastBloc(
-    private val repository: ForecastRepository,
+    private val getForecast: GetForecastUseCase,
 ) : BaseBloc<ForecastEvent.Load, ForecastState>() {
 
     override val tag = "LoadForecastBloc"
@@ -17,7 +17,7 @@ class LoadForecastBloc(
     ) {
         updateState { it.copy(isLoading = true, error = null, locationQuery = event.locationQuery) }
 
-        repository.getForecast(event.locationQuery).fold(
+        getForecast(event.locationQuery).fold(
             onSuccess = { forecast ->
                 updateState { it.copy(forecast = forecast, isLoading = false, error = null) }
             },
