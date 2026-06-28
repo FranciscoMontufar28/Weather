@@ -1,3 +1,13 @@
+
+## Sobre el uso de IA
+
+Las decisiones de arquitectura, los patrones de diseño (Clean Architecture + BLoC/MVI), la organización del proyecto y la estrategia de implementación son de mi autoría. Utilicé herramientas de IA (Claude) como asistente para acelerar la implementación de código repetitivo y para redactar esta documentación, siempre bajo mi dirección, revisión y criterio técnico.
+
+---
+## Sobre el uso de IA
+Para el diseño de la interfases se uso Pencil, un entorno parecido a Figma gratuito
+
+
 # Weather
 
 > **Prueba técnica Bold** — Aplicación Android nativa para consultar el clima actual y el pronóstico de los próximos 3 días, usando la API pública de [WeatherAPI](https://www.weatherapi.com/).
@@ -9,9 +19,18 @@
 > Reemplaza los archivos en la carpeta `screenshots/` después de compilar el proyecto.
 > Tamaño sugerido: 360 × 780 px (portrait) · 780 × 360 px (landscape).
 
-| Splash | Dashboard | Búsqueda | Pronóstico | Landscape | Error |
-|:------:|:---------:|:--------:|:----------:|:---------:|:-----:|
-| ![Splash](screenshots/01-splash.png) | ![Dashboard](screenshots/02-dashboard.png) | ![Búsqueda](screenshots/03-search.png) | ![Pronóstico](screenshots/04-forecast.png) | ![Landscape](screenshots/05-landscape.png) | ![Error](screenshots/06-error.png) |
+| Splash | Dashboard | 
+|:------:|:---------:|
+| ![Splash](https://github.com/user-attachments/assets/674f479a-42c7-49bd-9270-77043faec925) | ![Dashboard](https://github.com/user-attachments/assets/568925ad-b605-436f-813a-5dd341d9023e) |
+
+| Búsqueda | Pronóstico 
+|:--------:|:----------:
+| <img src="https://github.com/user-attachments/assets/01123abd-0c27-4b7b-9c39-114d05aafeb1" width="350"> |  <img src="https://github.com/user-attachments/assets/00cf9571-5419-485c-a476-1ef233550eb2" width="350"> |
+
+| Landscape Dashboard| Landscape Forecast |
+|:---------:|:-----:|
+| <img src="https://github.com/user-attachments/assets/ccb43f38-c81b-41d8-aa95-9ab419474e73" width="350"> |  <img src="https://github.com/user-attachments/assets/6cece76f-5200-477f-9802-47fb2c1a9d25" width="350"> |
+
 
 ---
 
@@ -344,12 +363,6 @@ El fondo de todas las pantallas refleja el momento del día mediante un gradient
 La transición entre etapas se realiza mediante interpolación lineal de color (`lerpSky`), lo que produce cambios graduales de 1-2 horas sin saltos. Adicionalmente, `starOpacity` controla la visibilidad de estrellas decorativas en pantalla (0 de día → 1 de noche).
 
 Para evitar recomposiciones excesivas, `rememberSkyColors()` agrupa la hora en buckets de 5 minutos: el estado solo cambia cada 5 minutos reales, no en cada frame. El gradiente se aplica en `SkyScaffold` (`core/ui/components/`) y es compartido por Dashboard, Search y Forecast.
-
----
-
-## Sobre el uso de IA
-
-Las decisiones de arquitectura, los patrones de diseño (Clean Architecture + BLoC/MVI), la organización del proyecto y la estrategia de implementación son de mi autoría. Utilicé herramientas de IA (Claude) como asistente para acelerar la implementación de código repetitivo y para redactar esta documentación, siempre bajo mi dirección, revisión y criterio técnico.
 
 ---
 
