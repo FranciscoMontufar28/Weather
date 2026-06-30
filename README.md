@@ -156,7 +156,7 @@ flowchart TD
     HILT -. inyecta .-> VM
     HILT -. inyecta .-> REPO
 
-    LOG["Timber · Logging<br/>BaseBloc.tag → errores con stacktrace<br/>onFailure en repos · use cases · blocs"]
+    LOG["Timber · Logging<br/>Timber.e() con DebugTree auto-tag<br/>BaseBloc.run · onFailure en repos · use cases · blocs"]
     BLOC -. loguea errores .-> LOG
     REPO -. loguea errores .-> LOG
     UC -. loguea errores .-> LOG
@@ -209,7 +209,7 @@ app/src/main/java/com/francisco/weather/
 ├── WeatherApplication.kt        # @HiltAndroidApp
 │
 ├── core/
-│   ├── bloc/                    # Motor BLoC: BaseBloc (con Timber.tag), BlocViewModel, BaseBlocFactory, BlocMap
+│   ├── bloc/                    # Motor BLoC: BaseBloc, BlocViewModel, BaseBlocFactory, BlocMap
 │   ├── data/
 │   │   ├── local/               # Room: WeatherDatabase · DAOs + Entities (recent, stadium, cachedWeather)
 │   │   └── recent/              # RecentSearchRepositoryImpl
@@ -343,8 +343,8 @@ Timber reemplaza los llamados directos a `android.util.Log`. El árbol se planta
 
 El logging de errores está cableado en dos niveles complementarios:
 
-- **`BaseBloc.run()`** — captura cualquier excepción que escape de `handleEvent` y la loguea con `Timber.tag(tag).e(...)`, usando el `override val tag` del bloc concreto (ej. `LoadForecastBloc`). Luego relanza para que `BlocViewModel.handleError` también reciba el error. Así el stacktrace queda etiquetado con el nombre exacto del bloc que falló.
-- **Callbacks `onFailure`** — en repos (`ForecastRepositoryImpl`, `SearchRepositoryImpl`), use cases (`SearchLocationsUseCase`) y blocs (`LoadForecastBloc`, `LoadCurrentWeatherBloc`), `Timber.e(cause, "…")` registra el error en el momento en que se transforma en `WeatherError` tipado. Los blocs usan `Timber.tag(tag)` para mantener la trazabilidad.
+- **`BaseBloc.run()`** — captura cualquier excepción que escape de `handleEvent` (excepto `CancellationException`, que se relanza para respetar el structured concurrency) y la loguea con `Timber.e(...)`. No relanza, por lo que un evento fallido no tumba el pipeline. `DebugTree` auto-etiqueta el log con el nombre de la clase llamante.
+- **Callbacks `onFailure`** — en repos (`ForecastRepositoryImpl`, `SearchRepositoryImpl`), use cases (`SearchLocationsUseCase`) y blocs (`LoadForecastBloc`, `LoadCurrentWeatherBloc`), `Timber.e(cause, "…")` registra el error en el momento en que se transforma en `WeatherError` tipado.
 
 En tests unitarios no se planta ningún árbol, por lo que `Timber` es un no-op y no rompe ningún test existente.
 
