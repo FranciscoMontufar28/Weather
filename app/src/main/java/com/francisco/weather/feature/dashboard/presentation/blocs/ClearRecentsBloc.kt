@@ -9,8 +9,6 @@ class ClearRecentsBloc(
     private val clearRecents: ClearRecentSearchesUseCase,
 ) : BaseBloc<DashboardEvent.ClearRecents, DashboardState>() {
 
-    override val tag = "ClearRecentsBloc"
-
     override suspend fun handleEvent(
         event: DashboardEvent.ClearRecents,
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,

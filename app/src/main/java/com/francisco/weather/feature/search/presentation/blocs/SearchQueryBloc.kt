@@ -17,8 +17,6 @@ class SearchQueryBloc(
     private val searchLocations: SearchLocationsUseCase,
 ) : BaseBloc<SearchEvent.QueryChanged, SearchState>() {
 
-    override val tag = "SearchQueryBloc"
-
     override suspend fun handleEvent(
         event: SearchEvent.QueryChanged,
         updateState: suspend ((SearchState) -> SearchState) -> Unit,

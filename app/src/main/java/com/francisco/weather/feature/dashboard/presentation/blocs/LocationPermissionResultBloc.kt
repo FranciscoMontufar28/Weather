@@ -13,8 +13,6 @@ import com.francisco.weather.feature.dashboard.presentation.DashboardState
  */
 class LocationPermissionResultBloc : BaseBloc<DashboardEvent.LocationPermissionResult, DashboardState>() {
 
-    override val tag = "LocationPermissionResultBloc"
-
     override suspend fun handleEvent(
         event: DashboardEvent.LocationPermissionResult,
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,

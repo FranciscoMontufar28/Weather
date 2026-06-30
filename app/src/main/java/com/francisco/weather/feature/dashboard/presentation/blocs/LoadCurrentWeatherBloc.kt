@@ -12,8 +12,6 @@ class LoadCurrentWeatherBloc(
     private val loadCurrentWeather: LoadCurrentWeatherUseCase,
 ) : BaseBloc<DashboardEvent.LoadCurrentWeather, DashboardState>() {
 
-    override val tag = "LoadCurrentWeatherBloc"
-
     override suspend fun handleEvent(
         event: DashboardEvent.LoadCurrentWeather,
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,
@@ -24,7 +22,7 @@ class LoadCurrentWeatherBloc(
                 updateState { it.copy(isApproxLocation = resolved.isApproximate) }
             },
             onFailure = { error ->
-                Timber.tag(tag).e(error, "Failed to load current weather")
+                Timber.e(error, "Failed to load current weather")
                 updateState {
                     it.copy(
                         isLoadingWeather = false,

@@ -6,8 +6,6 @@ import com.francisco.weather.feature.search.presentation.SearchState
 
 class ClearErrorBloc : BaseBloc<SearchEvent.ClearError, SearchState>() {
 
-    override val tag = "ClearErrorBloc"
-
     override suspend fun handleEvent(
         event: SearchEvent.ClearError,
         updateState: suspend ((SearchState) -> SearchState) -> Unit,

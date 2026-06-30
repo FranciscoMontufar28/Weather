@@ -6,8 +6,6 @@ import com.francisco.weather.feature.dashboard.presentation.DashboardState
 
 class GpsStateChangedBloc : BaseBloc<DashboardEvent.GpsStateChanged, DashboardState>() {
 
-    override val tag = "GpsStateChangedBloc"
-
     override suspend fun handleEvent(
         event: DashboardEvent.GpsStateChanged,
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,

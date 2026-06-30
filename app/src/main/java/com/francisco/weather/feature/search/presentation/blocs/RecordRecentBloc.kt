@@ -9,8 +9,6 @@ class RecordRecentBloc(
     private val recentRepository: RecentSearchRepository,
 ) : BaseBloc<SearchEvent.LocationSelected, SearchState>() {
 
-    override val tag = "RecordRecentBloc"
-
     override suspend fun handleEvent(
         event: SearchEvent.LocationSelected,
         updateState: suspend ((SearchState) -> SearchState) -> Unit,

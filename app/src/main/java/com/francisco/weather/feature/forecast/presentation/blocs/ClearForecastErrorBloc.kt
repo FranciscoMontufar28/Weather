@@ -7,8 +7,6 @@ import javax.inject.Inject
 
 class ClearForecastErrorBloc @Inject constructor() : BaseBloc<ForecastEvent.ClearError, ForecastState>() {
 
-    override val tag = "ClearForecastErrorBloc"
-
     override suspend fun handleEvent(
         event: ForecastEvent.ClearError,
         updateState: suspend ((ForecastState) -> ForecastState) -> Unit,

@@ -9,8 +9,6 @@ class GetRemoteStadiumsBloc(
     private val syncStadiums: SyncStadiumsUseCase,
 ) : BaseBloc<DashboardEvent.GetRemoteStadiums, DashboardState>() {
 
-    override val tag = "GetRemoteStadiumsBloc"
-
     override suspend fun handleEvent(
         event: DashboardEvent.GetRemoteStadiums,
         updateState: suspend ((DashboardState) -> DashboardState) -> Unit,
